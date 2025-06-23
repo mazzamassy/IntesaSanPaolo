@@ -1,0 +1,2613 @@
+<!DOCTYPE html>
+<!-- saved from url=(0112)https://eu-cdn.walkme.com/player/lib/20250612-204435-398d1d88-0d75ef10/resources/CD/CDhiddenIframe.compress.html -->
+<html><head><meta http-equiv="Content-Type" content="text/html; charset=windows-1252"></head><body><script type="text/javascript">(function(){
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/consts.js ###*/
+						var STORAGE_PREFIX = 'WalkMeStorage_';
+
+var TEST_CONNECTION_STRING = 'WalkMe_testStorage',
+	CROSS_DOMAIN_METHOD = {
+		Cookies: 'cookies',
+		LocalStorage: 'localStorage',
+		IndexedDB: 'indexedDB'
+	};
+
+var ORIGIN_MESSAGE = 'frameOrigin';
+
+var ORIGIN_VALIDATION = {
+	previewEnvName: 'preview'
+};
+
+var VALID_ENV_NAME = /^[a-zA-Z\d]{1,45}$/,
+	VALID_SETTINGS_FILE_NAME = /^settings\.(txt|js|json)$/;
+
+var REQUEST_TYPE = {
+	checkCanSave: 'checkCanSave',
+	getAllMultiple: 'getAllMultiple',
+	getAllRaw: 'getAllRaw',
+	getAllSystems: 'getAllSystems',
+	set: 'set',
+	delete: 'delete',
+	deleteAll: 'deleteAll',
+	add: 'add',
+	addSet: 'addSet',
+	get: 'get',
+	setSession: 'setSession',
+	getSession: 'getSession',
+	increment: 'increment',
+	getOrSetAndGet: 'getOrSetAndGet',
+	terminate: 'terminate',
+	remove: 'remove',
+	initBroadcastChannel: 'initBroadcastChannel',
+	reportLargeCookie: 'reportLargeCookie'
+};
+
+var CROSS_SYSTEM_FAKE_GUID = 'cross-system-fake-guid';
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/consts.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/di.js ###*/
+						var DI = {};
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/di.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/json.js ###*/
+						var _json = /*allowFunc*/JSON;
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/json.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/lz-string.js ###*/
+						// Copyright (c) 2013 Pieroxy <pieroxy@pieroxy.net>
+// This work is free. You can redistribute it and/or modify it
+// under the terms of the WTFPL, Version 2
+// For more information see LICENSE.txt or http://www.wtfpl.net/
+//
+// For more information, the home page:
+// http://pieroxy.net/blog/pages/lz-string/testing.html
+//
+// LZ-based compression algorithm, version 1.4.4
+var LZString = (function() {
+
+// private property
+var f = String.fromCharCode;
+// var keyStrBase64 = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/=";
+var keyStrUriSafe = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+-$";
+var baseReverseDic = {};
+
+function getBaseValue(alphabet, character) {
+  if (!baseReverseDic[alphabet]) {
+    baseReverseDic[alphabet] = {};
+    for (var i=0 ; i<alphabet.length ; i++) {
+      baseReverseDic[alphabet][alphabet.charAt(i)] = i;
+    }
+  }
+  return baseReverseDic[alphabet][character];
+}
+
+var LZString = {
+  // compressToBase64 : function (input) {
+  //   if (input == null) return "";
+  //   var res = LZString._compress(input, 6, function(a){return keyStrBase64.charAt(a);});
+  //   switch (res.length % 4) { // To produce valid Base64
+  //   default: // When could this happen ?
+  //   case 0 : return res;
+  //   case 1 : return res+"===";
+  //   case 2 : return res+"==";
+  //   case 3 : return res+"=";
+  //   }
+  // },
+
+  // decompressFromBase64 : function (input) {
+  //   if (input == null) return "";
+  //   if (input == "") return null;
+  //   return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrBase64, input.charAt(index)); });
+  // },
+
+  // compressToUTF16 : function (input) {
+  //   if (input == null) return "";
+  //   return LZString._compress(input, 15, function(a){return f(a+32);}) + " ";
+  // },
+
+  // decompressFromUTF16: function (compressed) {
+  //   if (compressed == null) return "";
+  //   if (compressed == "") return null;
+  //   return LZString._decompress(compressed.length, 16384, function(index) { return compressed.charCodeAt(index) - 32; });
+  // },
+
+  //compress into uint8array (UCS-2 big endian format)
+  // compressToUint8Array: function (uncompressed) {
+  //   var compressed = LZString.compress(uncompressed);
+  //   var buf=new Uint8Array(compressed.length*2); // 2 bytes per character
+
+  //   for (var i=0, TotalLen=compressed.length; i<TotalLen; i++) {
+  //     var current_value = compressed.charCodeAt(i);
+  //     buf[i*2] = current_value >>> 8;
+  //     buf[i*2+1] = current_value % 256;
+  //   }
+  //   return buf;
+  // },
+
+  //decompress from uint8array (UCS-2 big endian format)
+  // decompressFromUint8Array:function (compressed) {
+  //   if (compressed===null || compressed===undefined){
+  //       return LZString.decompress(compressed);
+  //   } else {
+  //       var buf=new Array(compressed.length/2); // 2 bytes per character
+  //       for (var i=0, TotalLen=buf.length; i<TotalLen; i++) {
+  //         buf[i]=compressed[i*2]*256+compressed[i*2+1];
+  //       }
+
+  //       var result = [];
+  //       buf.forEach(function (c) {
+  //         result.push(f(c));
+  //       });
+  //       return LZString.decompress(result.join(''));
+
+  //   }
+
+  // },
+
+
+  //compress into a string that is already URI encoded
+  compressToEncodedURIComponent: function (input) {
+    if (input == null) return "";
+    return LZString._compress(input, 6, function(a){return keyStrUriSafe.charAt(a);});
+  },
+
+  //decompress from an output of compressToEncodedURIComponent
+  decompressFromEncodedURIComponent:function (input) {
+    if (input == null) return "";
+    if (input == "") return null;
+    input = input.replace(/ /g, "+");
+    return LZString._decompress(input.length, 32, function(index) { return getBaseValue(keyStrUriSafe, input.charAt(index)); });
+  },
+
+  compress: function (uncompressed) {
+    return LZString._compress(uncompressed, 16, function(a){return f(a);});
+  },
+  _compress: function (uncompressed, bitsPerChar, getCharFromInt) {
+    if (uncompressed == null) return "";
+    var i, value,
+        context_dictionary= {},
+        context_dictionaryToCreate= {},
+        context_c="",
+        context_wc="",
+        context_w="",
+        context_enlargeIn= 2, // Compensate for the first entry which should not count
+        context_dictSize= 3,
+        context_numBits= 2,
+        context_data=[],
+        context_data_val=0,
+        context_data_position=0,
+        ii;
+
+    for (ii = 0; ii < uncompressed.length; ii += 1) {
+      context_c = uncompressed.charAt(ii);
+      if (!Object.prototype.hasOwnProperty.call(context_dictionary,context_c)) {
+        context_dictionary[context_c] = context_dictSize++;
+        context_dictionaryToCreate[context_c] = true;
+      }
+
+      context_wc = context_w + context_c;
+      if (Object.prototype.hasOwnProperty.call(context_dictionary,context_wc)) {
+        context_w = context_wc;
+      } else {
+        if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+          if (context_w.charCodeAt(0)<256) {
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<8 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          } else {
+            value = 1;
+            for (i=0 ; i<context_numBits ; i++) {
+              context_data_val = (context_data_val << 1) | value;
+              if (context_data_position ==bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = 0;
+            }
+            value = context_w.charCodeAt(0);
+            for (i=0 ; i<16 ; i++) {
+              context_data_val = (context_data_val << 1) | (value&1);
+              if (context_data_position == bitsPerChar-1) {
+                context_data_position = 0;
+                context_data.push(getCharFromInt(context_data_val));
+                context_data_val = 0;
+              } else {
+                context_data_position++;
+              }
+              value = value >> 1;
+            }
+          }
+          context_enlargeIn--;
+          if (context_enlargeIn == 0) {
+            context_enlargeIn = Math.pow(2, context_numBits);
+            context_numBits++;
+          }
+          delete context_dictionaryToCreate[context_w];
+        } else {
+          value = context_dictionary[context_w];
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+
+
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        // Add wc to the dictionary.
+        context_dictionary[context_wc] = context_dictSize++;
+        context_w = String(context_c);
+      }
+    }
+
+    // Output the code for w.
+    if (context_w !== "") {
+      if (Object.prototype.hasOwnProperty.call(context_dictionaryToCreate,context_w)) {
+        if (context_w.charCodeAt(0)<256) {
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<8 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        } else {
+          value = 1;
+          for (i=0 ; i<context_numBits ; i++) {
+            context_data_val = (context_data_val << 1) | value;
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = 0;
+          }
+          value = context_w.charCodeAt(0);
+          for (i=0 ; i<16 ; i++) {
+            context_data_val = (context_data_val << 1) | (value&1);
+            if (context_data_position == bitsPerChar-1) {
+              context_data_position = 0;
+              context_data.push(getCharFromInt(context_data_val));
+              context_data_val = 0;
+            } else {
+              context_data_position++;
+            }
+            value = value >> 1;
+          }
+        }
+        context_enlargeIn--;
+        if (context_enlargeIn == 0) {
+          context_enlargeIn = Math.pow(2, context_numBits);
+          context_numBits++;
+        }
+        delete context_dictionaryToCreate[context_w];
+      } else {
+        value = context_dictionary[context_w];
+        for (i=0 ; i<context_numBits ; i++) {
+          context_data_val = (context_data_val << 1) | (value&1);
+          if (context_data_position == bitsPerChar-1) {
+            context_data_position = 0;
+            context_data.push(getCharFromInt(context_data_val));
+            context_data_val = 0;
+          } else {
+            context_data_position++;
+          }
+          value = value >> 1;
+        }
+
+
+      }
+      context_enlargeIn--;
+      if (context_enlargeIn == 0) {
+        context_enlargeIn = Math.pow(2, context_numBits);
+        context_numBits++;
+      }
+    }
+
+    // Mark the end of the stream
+    value = 2;
+    for (i=0 ; i<context_numBits ; i++) {
+      context_data_val = (context_data_val << 1) | (value&1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data_position = 0;
+        context_data.push(getCharFromInt(context_data_val));
+        context_data_val = 0;
+      } else {
+        context_data_position++;
+      }
+      value = value >> 1;
+    }
+
+    // Flush the last char
+    while (true) {
+      context_data_val = (context_data_val << 1);
+      if (context_data_position == bitsPerChar-1) {
+        context_data.push(getCharFromInt(context_data_val));
+        break;
+      }
+      else context_data_position++;
+    }
+    return context_data.join('');
+  },
+
+  decompress: function (compressed) {
+    if (compressed == null) return "";
+    if (compressed == "") return null;
+    return LZString._decompress(compressed.length, 32768, function(index) { return compressed.charCodeAt(index); });
+  },
+
+  _decompress: function (length, resetValue, getNextValue) {
+    var dictionary = [],
+        next,
+        enlargeIn = 4,
+        dictSize = 4,
+        numBits = 3,
+        entry = "",
+        result = [],
+        i,
+        w,
+        bits, resb, maxpower, power,
+        c,
+        data = {val:getNextValue(0), position:resetValue, index:1};
+
+    for (i = 0; i < 3; i += 1) {
+      dictionary[i] = i;
+    }
+
+    bits = 0;
+    maxpower = 4; //Math.pow(2,2);
+    power=1;
+    while (power!=maxpower) {
+      resb = data.val & data.position;
+      data.position >>= 1;
+      if (data.position == 0) {
+        data.position = resetValue;
+        data.val = getNextValue(data.index++);
+      }
+      bits |= (resb>0 ? 1 : 0) * power;
+      power <<= 1;
+    }
+
+    switch (next = bits) {
+      case 0:
+          bits = 0;
+          maxpower = 256; //Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 1:
+          bits = 0;
+          maxpower = 65536; //Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+        c = f(bits);
+        break;
+      case 2:
+        return "";
+    }
+    dictionary[3] = c;
+    w = c;
+    result.push(c);
+    while (true) {
+      if (data.index > length) {
+        return "";
+      }
+
+      bits = 0;
+      maxpower = Math.pow(2,numBits);
+      power=1;
+      while (power!=maxpower) {
+        resb = data.val & data.position;
+        data.position >>= 1;
+        if (data.position == 0) {
+          data.position = resetValue;
+          data.val = getNextValue(data.index++);
+        }
+        bits |= (resb>0 ? 1 : 0) * power;
+        power <<= 1;
+      }
+
+      switch (c = bits) {
+        case 0:
+          bits = 0;
+          maxpower = 256; //Math.pow(2,8);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 1:
+          bits = 0;
+          maxpower = 65536; //Math.pow(2,16);
+          power=1;
+          while (power!=maxpower) {
+            resb = data.val & data.position;
+            data.position >>= 1;
+            if (data.position == 0) {
+              data.position = resetValue;
+              data.val = getNextValue(data.index++);
+            }
+            bits |= (resb>0 ? 1 : 0) * power;
+            power <<= 1;
+          }
+          dictionary[dictSize++] = f(bits);
+          c = dictSize-1;
+          enlargeIn--;
+          break;
+        case 2:
+          return result.join('');
+      }
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+      if (dictionary[c]) {
+        entry = dictionary[c];
+      } else {
+        if (c === dictSize) {
+          entry = w + w.charAt(0);
+        } else {
+          return null;
+        }
+      }
+      result.push(entry);
+
+      // Add w+entry[0] to the dictionary.
+      dictionary[dictSize++] = w + entry.charAt(0);
+      enlargeIn--;
+
+      w = entry;
+
+      if (enlargeIn == 0) {
+        enlargeIn = Math.pow(2, numBits);
+        numBits++;
+      }
+
+    }
+  }
+};
+  return LZString;
+})();
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/lz-string.js ###*/
+    DI.Compressor = LZString;
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/scriptsUtil.js ###*/
+						function createScriptElement(url, scriptIdName) {
+	var scriptElement = document.createElement('script');
+	scriptElement.async = true;
+	scriptElement.src = url;
+	scriptElement.id = scriptIdName;
+
+	return scriptElement;
+}
+
+function appendScriptToDocument(scriptElement) {
+	var documentHead = document.getElementsByTagName('head')[0];
+	documentHead.appendChild(scriptElement);
+}
+
+function addScriptWithCallback(url, callbackName, scriptIdName, onload, onerror, params) {
+	if (!url || !callbackName) {
+		return;
+	}
+
+	var scriptElement = createScriptElement(url, scriptIdName);
+
+	if (onload) {
+		scriptLoadedCallback(callbackName, onloadRunner, params);
+	}
+
+	if (onerror) {
+		scriptElement.onerror = onerrorRunner;
+	}
+
+	function onloadRunner() {
+		return onload.apply(this, arguments);
+	}
+
+	function onerrorRunner() {
+		return onerror.apply(this, [params]);
+	}
+
+	appendScriptToDocument(scriptElement);
+}
+
+function scriptLoadedCallback(callbackName, callbackFunction, params) {
+	var originalFunction = window[callbackName];
+	window[callbackName] = function(data) {
+		window[callbackName] = originalFunction;
+
+		return callbackFunction(data, params);
+	};
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/scriptsUtil.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/browserDetector.js ###*/
+						function getBrowserInfo() {
+		//http://www.quirksmode.org/js/detect.html
+		var BrowserDetect = {
+			init: function() {
+				this.browser = this.searchString(this.dataBrowser) || 'An unknown browser';
+				this.version = this.searchVersion(navigator.userAgent) || this.searchVersion(navigator.appVersion) || 'an unknown version';
+				this.OS = this.searchString(this.dataOS) || 'an unknown OS';
+			},
+			searchString: function(data) {
+				for (var i = 0; i < data.length; i++) {
+					var dataString = data[i].string;
+					var dataProp = data[i].prop;
+					this.versionSearchString = data[i].versionSearch || data[i].identity;
+					if (dataString) {
+						if (dataString.indexOf(data[i].subString) != -1) return data[i].identity;
+					} else if (dataProp) return data[i].identity;
+				}
+			},
+			searchVersion: function(dataString) {
+				var index = dataString.indexOf(this.versionSearchString);
+				if (index == -1) return;
+				return parseFloat(dataString.substring(index + this.versionSearchString.length + 1));
+			},
+			dataBrowser: [
+				{
+					string: navigator.userAgent,
+					subString: 'Chrome',
+					identity: 'Chrome'
+				},
+				{ string: navigator.userAgent, subString: 'OmniWeb', versionSearch: 'OmniWeb/', identity: 'OmniWeb' },
+				{
+					string: navigator.vendor,
+					subString: 'Apple',
+					identity: 'Safari',
+					versionSearch: 'Version'
+				},
+				{
+					prop: window.opera,
+					identity: 'Opera',
+					versionSearch: 'Version'
+				},
+				{
+					string: navigator.vendor,
+					subString: 'iCab',
+					identity: 'iCab'
+				},
+				{
+					string: navigator.vendor,
+					subString: 'KDE',
+					identity: 'Konqueror'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'Firefox',
+					identity: 'Firefox'
+				},
+				{
+					string: navigator.vendor,
+					subString: 'Camino',
+					identity: 'Camino'
+				},
+				{
+					// for newer Netscapes (6+)
+					string: navigator.userAgent,
+					subString: 'Netscape',
+					identity: 'Netscape'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'MSIE',
+					identity: 'Explorer',
+					versionSearch: 'MSIE'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'Trident',
+					identity: 'Explorer',
+					versionSearch: ' rv'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'Edge',
+					identity: 'Edge'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'Gecko',
+					identity: 'Mozilla',
+					versionSearch: 'rv'
+				},
+				{
+					// for older Netscapes (4-)
+					string: navigator.userAgent,
+					subString: 'Mozilla',
+					identity: 'Netscape',
+					versionSearch: 'Mozilla'
+				}
+			],
+			dataOS: [
+				{
+					string: navigator.platform,
+					subString: 'Win',
+					identity: 'Windows'
+				},
+				{
+					string: navigator.platform,
+					subString: 'Mac',
+					identity: 'Mac'
+				},
+				{
+					string: navigator.userAgent,
+					subString: 'iPhone',
+					identity: 'iPhone/iPod'
+				},
+				{
+					string: navigator.platform,
+					subString: 'Linux',
+					identity: 'Linux'
+				}
+			]
+		};
+		//////////////////////////////////////
+
+		BrowserDetect.init();
+
+		return BrowserDetect;
+	}
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/browserDetector.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/generalFunctions.js ###*/
+						function logError(message) {
+    try {
+        /*allowFunc*/console.log('Error: ' + message);
+    }
+    catch (err) {}
+}
+
+function testConnection(storageManager, callback) {
+    var failed = function() {
+        if (callback) callback(false);
+    };
+
+    try {
+        storageManager.setItem(TEST_CONNECTION_STRING, TEST_CONNECTION_STRING, TEST_CONNECTION_STRING, function() {
+            storageManager.getItem(TEST_CONNECTION_STRING, TEST_CONNECTION_STRING, function(value) {
+                storageManager.removeItem(TEST_CONNECTION_STRING, TEST_CONNECTION_STRING, undefined, undefined, true);
+
+                callback(value == TEST_CONNECTION_STRING);
+            }, failed, true);
+        }, failed, false, true);
+    }
+    catch (err) {
+        failed();
+    }
+}
+
+function increment(storageManager, userGuid, key, ttl, lastValue, successback, failback) {
+    storageManager.getItem(userGuid, key, function(valueObj) {
+        valueObj = valueObj || {value : 0};
+
+        if (valueObj.value !== lastValue)
+            valueObj.value++;
+
+        valueObj.saveTime = new Date().getTime();
+        valueObj.expireSeconds = ttl;
+
+        storageManager.setItem(userGuid, key, valueObj, function() {
+            if (successback) successback(valueObj.value);
+        }, failback);
+    }, failback);
+}
+
+function getOrSetAndGet(storageManager, userGuid, key, ttl, fallbackValue, successback, failback) {
+    storageManager.getItem(userGuid, key, function(valueObj) {
+        if (!valueObj) {
+            valueObj = {
+                value: _json.stringify(fallbackValue),
+                saveTime: new Date().getTime(),
+                expireSeconds: ttl
+            }
+            
+            storageManager.setItem(userGuid, key, valueObj, function() {
+                if (successback) {
+                    successback(fallbackValue);
+                }
+            }, failback);
+        } else {
+            if (successback) {
+                successback(_json.parse(valueObj.value));
+            }
+        }
+    }, failback);
+}
+
+function addToDictionary(userGuid, dictionaryKey, keyValues, saveObj) {
+    if (storageManager.addToDictionary) {
+        storageManager.setItem(userGuid, dictionaryKey, saveObj, null, null, false);
+
+        for (var key in keyValues) {
+            if (keyValues.hasOwnProperty(key)) {
+                storageManager.addToDictionary(userGuid, dictionaryKey, key, keyValues[key]);
+            }
+        }
+    }
+    else {
+        // Here we just get the only dictionary and add the deltas to it, then we update
+        // the saveObj that contains the expiration data with the new expiration data
+        // TODO: implement this in the base class of the storage managers
+        storageManager.getItem(userGuid, dictionaryKey, function(oldObj) {
+            var dictionary = {};
+
+            if (oldObj && oldObj.value)
+                dictionary = _json.parse(oldObj.value) || {};
+
+            for (var key in keyValues) {
+                if (keyValues.hasOwnProperty(key)) {
+                    dictionary[key] = keyValues[key];
+                }
+            }
+
+            saveObj.value = _json.stringify(dictionary);
+
+            storageManager.setItem(userGuid, dictionaryKey, saveObj);
+        });
+    }
+}
+
+function removeFromDictionary(userGuid, dictionaryKey, keysToRemove, saveObj) {
+    if (storageManager.removeFromDictionary) {
+        storageManager.setItem(userGuid, dictionaryKey, saveObj, null, null, false);
+
+        for (var i = 0; i < keysToRemove.length; i++) {
+            storageManager.removeFromDictionary(userGuid, dictionaryKey, keysToRemove[i]);
+        }
+    }
+    else {
+        storageManager.getItem(userGuid, dictionaryKey, function(oldObj) {
+            var dictionary = {};
+
+            if (oldObj && oldObj.value)
+                dictionary = _json.parse(oldObj.value) || {};
+
+            var isChanged = false;
+
+            for (var i = 0; i < keysToRemove.length; i++) {
+                var key = keysToRemove[i];
+
+                if (dictionary[key] !== undefined) {
+                    delete dictionary[key];
+                    isChanged = true;
+                }
+            }
+
+            if (isChanged) {
+                saveObj.value = _json.stringify(dictionary);
+                storageManager.setItem(userGuid, dictionaryKey, saveObj);
+            }
+        });
+    }
+}
+
+function getAllSavedDataMultiple(userGuid, plainUserGuid, callback)
+{
+    var failed = function() {
+        if (callback) callback();
+    };
+
+    try {
+        var allUsersData = {};
+        getStorageManagerToUse(userGuid).getAll(userGuid, function(data) {
+            if (data) {
+                allUsersData[plainUserGuid] = data;
+            }
+
+            if (callback) callback(allUsersData);
+
+        }, failed);
+    }
+    catch (err) {
+        logError(err);
+        failed();
+    }
+}
+
+function addToSet(userGuid, key, saveObj){
+    if (storageManager.addToSet) {
+        storageManager.addToSet(userGuid, key, saveObj);
+    }
+    else {
+        storageManager.getItem(userGuid, key, function(oldObj) {
+            var arr = [];
+
+            if (oldObj && oldObj.value)
+                arr = _json.parse(oldObj.value) || [];
+
+            var addedRange = saveObj.value;
+            for (var i = 0; i < addedRange.length; i++){
+                if (arr.indexOf(addedRange[i]) == -1){
+                    arr.push(addedRange[i]);
+                }
+            }
+
+            saveObj.value = _json.stringify(arr);
+
+            storageManager.setItem(userGuid, key, saveObj);
+        });
+    }
+}
+
+function generateUserGuidEnv(userGuid, data) {
+    if(data.extraData && data.extraData.envName && VALID_ENV_NAME.test(data.extraData.envName)){
+        return userGuid + '_' + data.extraData.envName;
+    }
+    return userGuid;
+}
+
+function shouldHandleRequestType(requestType) {
+    return !!REQUEST_TYPE[requestType];
+}
+
+function getStorageManagerToUse(guid) {
+    if (guid.indexOf(CROSS_SYSTEM_FAKE_GUID) === 0 && crossSystemClientStorageManager) {
+        return crossSystemClientStorageManager;
+    }
+    return storageManager;
+}
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/generalFunctions.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/guidOriginClass.js ###*/
+						function GuidOriginClass() {
+	var _this = this;
+	_this._guid,
+		(_this._validOrigins = new Set()),
+		(_this._unValidOrigins = new Set()),
+		(_this._originWhiteList = []),
+		(_this._requestsWaiting = []);
+
+	function ctor(params) {
+		_this._guid = params.userGuid;
+	}
+
+	_this.setOriginWhiteList = function(list) {
+		if (Array.isArray(list)) {
+			_this._originWhiteList = list;
+		}
+	};
+
+	_this.addWaitingRequests = function(request) {
+		_this._requestsWaiting.push(request);
+	};
+
+	_this.getWaitingRequest = function() {
+		return _this._requestsWaiting;
+	};
+
+	_this.clearWaitingRequests = function() {
+		_this._requestsWaiting = [];
+	};
+
+	_this.addValidOrigin = function(origin) {
+		_this._validOrigins.add(origin);
+	};
+
+	_this.addUnValidOrigin = function(origin) {
+		_this._unValidOrigins.add(origin);
+	};
+
+	_this.wasOriginValidated = function(origin) {
+		return _this._validOrigins.has(origin);
+	};
+
+	_this.wasOriginUnValidated = function(origin) {
+		return _this._unValidOrigins.has(origin);
+	};
+
+	_this.getOriginWhiteList = function() {
+		return _this._originWhiteList;
+	};
+
+	ctor.apply(null, arguments);
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/guidOriginClass.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/originValidator.js ###*/
+						var guidsOriginList = {};
+
+// Replace #GUID_ORIGIN_WHITE_LIST on publish 
+// e.g {<guid>:[<domain>, <domain>], <guid>: [<domain>]}
+var GUID_ORIGIN_WHITE_LIST = "#GUID_ORIGIN_WHITE_LIST";
+var _skipValidation;
+
+function initGuidOriginWhitelist(guidDomainList) {
+	if (typeof guidDomainList === 'object') {
+		for (var guid in guidDomainList) {
+			guidsOriginList[guid] = new GuidOriginClass(guid);
+			var originRegex = buildOriginRegex(guidDomainList[guid]);
+			guidsOriginList[guid].setOriginWhiteList(originRegex);
+		}
+	} else {
+		_skipValidation = true;
+	}
+}
+
+initGuidOriginWhitelist(GUID_ORIGIN_WHITE_LIST);
+
+function wasOriginInitialized(userGuid) {
+	return !!guidsOriginList[userGuid];
+}
+
+function buildOriginRegex(origins) {
+	var regexList = [];
+
+	for (var i = 0; i < origins.length; i++) {
+		regexList.push(new RegExp('^(http(s)?:\\/\\/)(.*\\.)?' + escapeRegExp(origins[i]) + '(:\\d+)?$'));
+	}
+
+	return regexList;
+}
+
+function escapeRegExp(string) {
+	return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
+
+
+function logUnvalidOrigin(origin) {
+	logError('Unvalid origin:' + origin);
+}
+
+function shouldSkipValidation(data, origin) {
+	if ((_skipValidation) || (data.extraData && data.extraData.envName === ORIGIN_VALIDATION.previewEnvName)) {
+		return true;
+	}
+
+	// IE passes the origin of CD proxy as "about:".
+	return origin === 'about:';
+}
+
+function isValidOrigin(data, event) {
+	var origin = event.origin;
+	if (shouldSkipValidation(data, origin)) return true;
+
+	var guidOrigin = guidsOriginList[data.plainUserGuid];
+
+	if (!guidOrigin || guidOrigin.wasOriginUnValidated(origin)) {
+		return false;
+	}
+
+	var guidOriginList = guidOrigin.getOriginWhiteList();
+
+	if (guidOrigin.wasOriginValidated(origin) || !guidOriginList.length) {
+		return true;
+	}
+
+	for (var i = 0; i < guidOriginList.length; i++) {
+		if (guidOriginList[i].test(origin)) {
+			guidOrigin.addValidOrigin(origin);
+			return true;
+		}
+	}
+
+	logUnvalidOrigin(origin);
+	guidOrigin.addUnValidOrigin(origin);
+	return false;
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/originValidator.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/cookiesManager.js ###*/
+						/* Cookies Manager */
+function CookiesManager() {
+	var _this = this;
+	var _compressor;
+	var _cookieSizeReportSent = false;
+
+	var PATH_COOKIE_PREFIX = ';path=/';
+	var GRANULAR_PATH = 'player/lib/';
+	var DOMAIN_COOKIE_PREFIX = ';domain=';
+	var EXPIRES_COOKIE_PREFIX = ';expires=';
+	var SECURE_COOKIE_FLAG = ';secure';
+	var SAME_SITE_NONE_COOKIE_FLAG = ';SameSite=None';
+	var SAME_SITE_LAX_COOKIE_FLAG = ';SameSite=Lax';
+	var PARTITIONED_COOKIE_FLAG = ';Partitioned';
+	var COOKIE_ASSIGN_VALUE_CHAR = '=';
+
+	var DELETED_COOKIE = '***DEL***';
+	var TWO_YEARS = 60 * 60 * 24 * 365 * 2;
+
+	var CHUNK_LENGTH = 4096; //4KB
+	var _securityFlag = '';
+	var _partitionedFlag = '';
+	var _cookiePath = PATH_COOKIE_PREFIX;
+
+	function ctor(isPartitioned) {
+		_compressor = DI.Compressor;
+		_partitionedFlag = isPartitioned ? PARTITIONED_COOKIE_FLAG : '';
+
+		var borwserInfo = getBrowserInfo();
+
+		// Safari doesn't support SameSite=None
+		if (borwserInfo.browser === 'Safari') {
+			_securityFlag = isHttps() ? SECURE_COOKIE_FLAG : SAME_SITE_LAX_COOKIE_FLAG;
+		}
+		else {
+			_securityFlag = isHttps() ? SAME_SITE_NONE_COOKIE_FLAG + SECURE_COOKIE_FLAG : SAME_SITE_LAX_COOKIE_FLAG;
+		}
+	}
+
+	function isHttps() {
+		return window.location.protocol === 'https:';
+	}
+
+	function shouldUseGranularPath() {
+		return window.location.pathname.indexOf('/' + GRANULAR_PATH) === 0;
+	}
+
+	_this.init = function init(userGuid, successback) {
+		if (shouldUseGranularPath()) {
+			updatePathToGranular(userGuid);
+		}
+		if (successback) successback();
+	};
+
+	_this.testConnection = function(callback) {
+		testConnection(_this, callback);
+	};
+
+	this.setItem = function(userGuid, key, value, successback, failback) {
+		try {
+			var storage = getStorage(userGuid);
+			storage[key] = value;
+			setStorage(userGuid, storage, TWO_YEARS);
+
+			if (successback) successback();
+		} catch (err) {
+			if (failback) failback(err);
+		}
+	};
+
+	this.getItem = function(userGuid, key, successback, failback) {
+		try {
+			var storage = getStorage(userGuid);
+			if (successback) successback(storage[key]);
+		} catch (err) {
+			if (failback) failback(err);
+		}
+	};
+
+	this.getAll = function(userGuid, successback, failback) {
+		try {
+			var storage = getStorage(userGuid);
+			var data = [];
+
+			for (var currKey in storage) {
+				var currData = storage[currKey];
+				if (currData !== undefined) {
+					data.push({ key: currKey, saveObj: currData });
+				}
+			}
+
+			if (successback) successback(data);
+		} catch (err) {
+			if (failback) failback(err);
+		}
+	};
+
+	this.removeItem = function(userGuid, key, successback, failback) {
+		try {
+			var storage = getStorage(userGuid);
+			delete storage[key];
+			setStorage(userGuid, storage, TWO_YEARS);
+			if (successback) successback();
+		} catch (err) {
+			if (failback) failback(err);
+		}
+	};
+
+	this.removeAll = function(userGuid) {
+		var storageName = STORAGE_PREFIX + userGuid;
+		clearOldStorageCookiesForGuid(storageName);
+	}
+
+	this.increment = function(userGuid, key, ttl, lastValue, successback, failback) {
+		increment(_this, userGuid, key, ttl, lastValue, successback, failback);
+	};
+
+	this.getOrSetAndGet = function(userGuid, key, ttl, fallbackValue, successback, failback) {
+		getOrSetAndGet(_this, userGuid, key, ttl, fallbackValue, successback, failback);
+	};
+
+	function setStorage(guid, storage, expiresSeconds, domain) {
+		var storageName = STORAGE_PREFIX + guid;
+		clearOldStorageCookiesForGuid(storageName, domain);
+
+		var value = _json.stringify(storage);
+
+		// there is no need to save an empty storage
+		if (value === '{}') return;
+
+		if (_compressor) value = _compressor.compressToEncodedURIComponent(value);
+
+		// save only strings, not numbers
+		if (typeof value != 'string') {
+			value = value.toString();
+
+			
+		}
+
+		if (value.indexOf(';') > -1) {
+			
+
+			value.replace(';', '');
+		}
+
+		var chunkLengthAfterKey = getChunkFreeSpaceForCookie(storageName, expiresSeconds, domain);
+		var valueSplitted = splitSubstring(value, chunkLengthAfterKey);
+
+		for (var cookieIndex = 0; cookieIndex < valueSplitted.length; cookieIndex++) {
+			var currCookieVal = valueSplitted[cookieIndex];
+
+			var currCookieKey = storageName;
+			if (cookieIndex > 0) {
+				currCookieKey += '_' + cookieIndex;
+			}
+
+			//set cookie to browser
+			setCookieToDocument(currCookieKey, currCookieVal, expiresSeconds, domain);
+		}
+	}
+
+	function clearOldStorageCookiesForGuid(storageName, domain) {
+		var cookieName,
+			currCookieIndex,
+			ARRcookies = document.cookie.split(';');
+
+		for (currCookieIndex = 0; currCookieIndex < ARRcookies.length; currCookieIndex++) {
+			cookieName = ARRcookies[currCookieIndex].substr(0, ARRcookies[currCookieIndex].indexOf('='));
+			cookieName = cookieName.replace(/^\s+|\s+$/g, '');
+
+			if (cookieName.indexOf(storageName) === 0) {
+				var chunkNumOrEnv = cookieName.replace(storageName, '').split('_')[1];
+				if (!chunkNumOrEnv || !isNaN(chunkNumOrEnv)) { // first chunk or a chunk number
+					deleteCookieFromDocument(cookieName, domain);
+				}
+			}
+		}
+	}
+
+	function getChunkFreeSpaceForCookie(storageName, expiresSeconds, domain) {
+		var expiresString = getExpiresString(expiresSeconds);
+		var domainString = getDomainString(domain);
+
+		// calcualte the size we have left for the cookie
+		var result =
+			CHUNK_LENGTH -
+			(storageName.length +
+			3 + // +3 for up to ('_50').length which is the max amount of cookies a domian allowed
+				expiresString.length +
+				domainString.length +
+				_cookiePath.length);
+
+		return result;
+	}
+
+	function setCookieToDocument(key, value, expiresSeconds, domain) {
+		var expireString = getExpiresString(expiresSeconds);
+		var domainString = getDomainString(domain);
+
+		var cookieValue = value + expireString + _cookiePath + domainString;
+		
+		if (value === DELETED_COOKIE) {
+			// we must make sure to delete both partitioned and non partitioned cookies to avoid duplicates
+			document.cookie = key + COOKIE_ASSIGN_VALUE_CHAR + cookieValue + _securityFlag;
+			document.cookie = key + COOKIE_ASSIGN_VALUE_CHAR + cookieValue + _securityFlag + PARTITIONED_COOKIE_FLAG;
+		} else {
+			document.cookie = key + COOKIE_ASSIGN_VALUE_CHAR + cookieValue + _securityFlag + _partitionedFlag;
+		}
+	}
+
+	function deleteCookieFromDocument(cookieName, domain) {
+		setCookieToDocument(cookieName, DELETED_COOKIE, TWO_YEARS * -1, domain);
+	}
+
+	function getExpiresString(expiresSeconds) {
+		var expireString = '';
+
+		// If we entered 0, than we wanted the cookie to last the entire session. negative means delete the cookie
+		if (expiresSeconds != 0 && !isNaN(expiresSeconds)) {
+			var exdate = new Date();
+			exdate.setTime(exdate.getTime() + expiresSeconds * 1000);
+
+			expireString = EXPIRES_COOKIE_PREFIX + exdate.toUTCString();
+		}
+
+		return expireString;
+	}
+
+	function getDomainString(domain) {
+		var domainString = '';
+		if (domain && domain.length > 0) {
+			domainString = DOMAIN_COOKIE_PREFIX + domain;
+		}
+
+		return domainString;
+	}
+
+	function splitSubstring(str, len) {
+		var result = [];
+		for (var offset = 0, strLen = str.length; offset < strLen; offset += len) {
+			result.push(str.substring(offset, offset + len));
+		}
+
+		return result;
+	}
+
+	function getStorage(guid) {
+		var storageItemsDict,
+			storageItemsString,
+			ARRcookies = document.cookie.split(';'),
+			storageName = STORAGE_PREFIX + guid;
+
+		storageItemsDict = getStorageItemsDict(ARRcookies, storageName);
+		storageItemsString = parseStorageDict(storageItemsDict, storageName);
+
+		if (_compressor) {
+			storageItemsString = _compressor.decompressFromEncodedURIComponent(storageItemsString);
+		}
+
+		if (!storageItemsString || storageItemsString == DELETED_COOKIE) {
+			return {};
+		}
+
+		try {
+			return _json.parse(storageItemsString) || {};
+		} catch (err) {
+			return {};
+		}
+	}
+
+	function getStorageItemsDict(ARRcookies, storageName) {
+		var cookieName,
+			cookieValue,
+			currCookieIndex,
+			storageKeysDict = {};
+
+		for (currCookieIndex = 0; currCookieIndex < ARRcookies.length; currCookieIndex++) {
+			cookieName = ARRcookies[currCookieIndex].substr(0, ARRcookies[currCookieIndex].indexOf('='));
+			cookieValue = ARRcookies[currCookieIndex].substr(ARRcookies[currCookieIndex].indexOf('=') + 1);
+			cookieName = cookieName.replace(/^\s+|\s+$/g, '');
+
+			if (cookieName.indexOf(storageName) === 0) {
+				var chunkNumOrEnv = cookieName.replace(storageName, '').split('_')[1];
+				if (!chunkNumOrEnv || !isNaN(chunkNumOrEnv)) { // first chunk or a chunk number
+					storageKeysDict[cookieName] = cookieValue;
+				}
+			}
+		}
+
+		return storageKeysDict;
+	}
+
+	function parseStorageDict(storageItemsDict, storageName) {
+		var result = '',
+			cookieIndex;
+		for (cookieIndex = 0; cookieIndex < objectKeysLength(storageItemsDict); cookieIndex++) {
+			var currCookieKey =
+				cookieIndex === 0
+					? storageName // this will enable backwards competability
+					: storageName + ('_' + cookieIndex);
+
+			if (storageItemsDict.hasOwnProperty(currCookieKey)) {
+				result += storageItemsDict[currCookieKey];
+			}
+		}
+
+		return result;
+	}
+
+	function objectKeysLength(obj) {
+		var count = 0;
+
+		for (var prop in obj) {
+			if (obj.hasOwnProperty(prop)) {
+				count++;
+			}
+		}
+
+		return count;
+	}
+
+	function clearStorage(guid) {
+		setStorage(guid, DELETED_COOKIE);
+	}
+
+	function updatePathToGranular(userGuid) {
+		try {
+			var storage = getStorage(userGuid);
+			var storageName = STORAGE_PREFIX + userGuid;
+			var testStorageName = STORAGE_PREFIX + TEST_CONNECTION_STRING;
+	
+			clearOldStorageCookiesForGuid(storageName);
+			clearOldStorageCookiesForGuid(testStorageName);
+	
+			_cookiePath = PATH_COOKIE_PREFIX + GRANULAR_PATH;
+	
+			setStorage(userGuid, storage, TWO_YEARS);
+		} 
+		catch (err) {
+			logError('failed to change cookie path to granular with error: ' + err);
+		}
+	}
+
+	this.getAllRaw = function(callback) {
+		try {
+			if (callback) callback(getStorageItemsDict(document.cookie.split(';'), STORAGE_PREFIX));
+		} catch (err) {
+			if (callback) callback(err);
+		}
+	};
+
+	this.getAllSystems = function(envName, callback) {
+		try {
+			var envSuffix = envName ? '_' + envName : '';
+			var allGuids = getAllSavedGuids(envSuffix);
+			var result = {};
+			allGuids.forEach(function(guid) {
+				var storage = getStorage(guid + envSuffix);
+				var data = [];
+				for (var currKey in storage) {
+					var currData = storage[currKey];
+					if (currData !== undefined) {
+						data.push({ key: currKey, saveObj: currData });
+					}
+				}
+				result[guid] = data;
+			});
+			if (callback) callback(result);
+		} catch (err) { }
+	};
+
+	this.sendCookieSizeReport = function(messageSource, savedKey) {
+		try {
+			if (document.cookie.length > 28000 && !_cookieSizeReportSent) {
+				var sizeReport = getCookieSizeReport();
+				messageSource.postMessage(_json.stringify({key:REQUEST_TYPE.reportLargeCookie, cookieSizeReport: sizeReport, savedKey: savedKey}), '*');
+				_cookieSizeReportSent = true;
+			}
+		} catch (err) {
+			logError(err);
+		}
+	};
+	
+	function getCookieSizeReport() {
+		var allGuids = getAllSavedGuidsAndEnvs();
+		var savedSystems = {};
+		var largest;
+
+		allGuids.forEach(function(guid) {
+			var storage = getStorage(guid);
+			var currentLargest = getLargestKeyAndValue(storage);
+			if (!largest || currentLargest.unCompressedSize > largest.unCompressedSize) {
+				largest = currentLargest;
+			}
+
+			savedSystems[guid] = {
+				compressedSize: getStorageSize(guid),
+				unCompressedKeys: getKeysSizeMap(storage)
+			}
+		});
+
+		return {
+			totalCookieSize: document.cookie.length,
+			cookieNames: getAllCookieNames(),
+			savedSystems: savedSystems,
+			largestValueSaved: largest
+		};
+	};
+
+	function getStorageSize(guid) {
+		var ARRcookies = document.cookie.split(';'),
+			storageName = STORAGE_PREFIX + guid,
+			totalSavedData = '';
+
+		for (var currCookieIndex = 0; currCookieIndex < ARRcookies.length; currCookieIndex++) {
+			var separatorIndex = ARRcookies[currCookieIndex].indexOf('=');
+			var cookieName = ARRcookies[currCookieIndex].substring(0, separatorIndex);
+			var cookieValue = ARRcookies[currCookieIndex].substring(separatorIndex + 1);
+			cookieName = cookieName.replace(/^\s+|\s+$/g, '');
+			
+			if (cookieName.indexOf(storageName) === 0) {
+				var chunkNumOrEnv = cookieName.replace(storageName, '').split('_')[1];
+				if (!chunkNumOrEnv || !isNaN(chunkNumOrEnv)) { // first chunk or a chunk number
+					totalSavedData += cookieName + cookieValue;
+				}
+			}
+		}
+
+		return totalSavedData.length;
+	};
+
+	function getKeysSizeMap(storage) {
+		var keysSizeMap = {};
+		for (var key in storage) {
+			keysSizeMap[key] = key.length + JSON.stringify(storage[key]).length;
+		}
+		return keysSizeMap;
+	};
+
+	function getLargestKeyAndValue(storage) {
+		var maxLength = 0;
+		var largest = { unCompressedSize: 0 };
+		for (var key in storage) {
+			var totalSavedLength = key.length + JSON.stringify(storage[key]).length;
+			if (totalSavedLength > maxLength) {
+				maxLength = totalSavedLength;
+				largest = { 
+					key: key,
+					saveTime: storage[key].saveTime ? storage[key].saveTime : 0,
+					expireSeconds: storage[key].expireSeconds ? storage[key].expireSeconds : 0,
+					valuePreview: storage[key].value ? storage[key].value.substring(1,101) : '',
+					unCompressedSize: totalSavedLength 
+				};
+			}
+		}
+		return largest;
+	};
+
+	function getAllSavedGuidsAndEnvs() {
+		var ARRcookies = document.cookie.split(';');
+		var allGuids = new Set();
+
+		for (var currentCookieIndex = 0; currentCookieIndex < ARRcookies.length; currentCookieIndex++) {
+			var cookieName = ARRcookies[currentCookieIndex].substring(0, ARRcookies[currentCookieIndex].indexOf('='));
+			cookieName = cookieName.replace(/^\s+|\s+$/g, '');
+			var splittedCookieName = cookieName.split('_');
+			var guid = splittedCookieName[1];
+			if (splittedCookieName[2] && isNaN(splittedCookieName[2])) { // to get all the envs
+				guid += '_' + splittedCookieName[2];
+			}
+			allGuids.add(guid);
+		}
+
+		return allGuids;
+	};
+
+	function getAllSavedGuids(envSuffix) {
+		var cookieIndex,
+			ARRcookies = document.cookie.split(';'),
+			allGuids = new Set();
+
+		for (cookieIndex = 0; cookieIndex < ARRcookies.length; cookieIndex++) {
+			var cookieName = ARRcookies[cookieIndex].substring(0, ARRcookies[cookieIndex].indexOf('='));
+			cookieName = cookieName.replace(/^\s+|\s+$/g, '');
+			if (cookieName.indexOf(STORAGE_PREFIX) === 0) {
+				var guid = cookieName.split('_')[1];
+				if (cookieName.substring(STORAGE_PREFIX.length + guid.length) === envSuffix) {
+					allGuids.add(guid);
+				}
+			}
+		}
+
+		return allGuids;
+	}
+
+	function getAllCookieNames() {
+		var cookieNames = [];
+		var ARRcookies = document.cookie.split(';');
+		for (var i = 0; i < ARRcookies.length; i++) {
+			cookieNames.push(ARRcookies[i].split('=')[0].replace(/^\s+|\s+$/g, ''));
+		}
+		return cookieNames;
+	}
+
+	ctor.apply(null, arguments);
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/cookiesManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/localStorageManager.js ###*/
+						function LocalStorageManager() {
+	
+	var _this = this,
+
+		STORAGE_PREFIX = "WMS",
+		DICTIONARY_REGEX = /\[guid=(.+) dict=(.+) key=([\s\S]+)\]$/,
+		NEW_ITEM_REGEX = /\[guid=(.+) key=([\s\S]+)\]$/,
+		USER_GUID_INDEX = 1,
+		REGULAR_KEY_INDEX = 2,
+		KEY_IN_DICTIONARY_INDEX = 3,
+		DICTIONARY_KEY_INDEX = 2,
+
+		_localStorage;
+
+	var _cacheValid;
+
+	function ctor() {
+	    try {
+	        _localStorage = window.localStorage;
+	    }
+	    catch (err) {
+            logError('local storage is blocked by browser settings error=' + err);
+	    }
+	}
+
+	_this.testConnection = function(callback) {
+	    testConnection(_this, callback);
+	};
+
+	_this.init = function init(userGuid, successback) {
+		try {
+ 			decodeAndUngroupUserData(userGuid);
+		}
+		catch(err) {
+			logError('error upgrading old data error=' + err);
+		}
+
+		bindStorageEvents();
+
+		if (successback) successback();
+	};
+
+	function bindStorageEvents() {
+		if (window.addEventListener) {
+			window.addEventListener("storage", invalidateCache, false);
+		} else if (window.attachEvent) {
+			document.attachEvent("onstorage", invalidateCache);
+		}
+	}
+
+	function unbindStorageEvents() {
+		if (window.removeEventListener) {
+			window.removeEventListener("storage", invalidateCache, false);
+		} else if (window.attachEvent) {
+			document.detachEvent("onstorage", invalidateCache);
+		}
+	}
+
+	_this.terminate = function() {
+        unbindStorageEvents();
+    };
+
+	function invalidateCache() {
+	    _cacheValid = false;
+	}
+
+	// migrate data from grouped storage in case of grouped storage rollback
+	function decodeAndUngroupUserData(guid) {
+		if (isGroupedStorageExists(guid)) {
+			alignGroupedStorageEncoding(guid);
+			var groupedData = getGroupedStorage(guid);
+
+			for (var key in groupedData) {
+				if (groupedData.hasOwnProperty(key)) {
+					var dict = tryParseDictionaryFromStorage(groupedData[key].value);
+					if (dict) {
+						var saveObj = {
+							value: '{}', 
+							saveTime: groupedData[key].saveTime, 
+							expireSeconds: groupedData[key].expireSeconds
+						};
+						addToDictionary(guid, key, dict, saveObj)
+					} else {
+						_this.setItem(guid, key, groupedData[key]);
+					}
+				}
+			}
+
+			removeGroupedStorage(guid);
+		}
+	}
+
+	_this.setItem = function(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey) {
+	    try {
+	        var storageKey;
+
+	        if (isStandaloneKey) {
+	            storageKey = key;
+	        }
+	        else {
+	            storageKey = createStorageKey(userGuid, key);    
+	            addKey(userGuid, storageKey);
+	        }
+	        
+	        _localStorage.setItem(storageKey, _json.stringify(value));
+
+	        if (clearDictionary || clearDictionary === undefined) {
+	            removeDictionaryEntries(userGuid, key);
+	        }
+
+	        if (successback) successback();
+	    }
+	    catch (err) {
+	        if (failback) failback(err);
+	    }
+	};
+
+	function removeDictionaryEntries(userGuid, dictionaryKey) {
+	    var keys = getStorageKeys(userGuid);
+
+	    // TODO: this happens VERY often when cd_play is on - is it a good idea to run so many regex's?
+	    for (var i = 0; i < keys.length; i++) {
+	        var storageKey = keys[i];
+	        var matches = DICTIONARY_REGEX.exec(storageKey);
+
+	        if (matches && matches[USER_GUID_INDEX] == userGuid && matches[DICTIONARY_KEY_INDEX] == dictionaryKey) {
+	            removeKey(userGuid, storageKey);
+	            _localStorage.removeItem(storageKey);
+	        }
+	    }
+	}
+
+	this.getItem = function(userGuid, key, successback, failback, isStandaloneKey) {
+	    try {
+	        var storageKey = isStandaloneKey ? key : createStorageKey(userGuid, key);
+	        var value = _localStorage.getItem(storageKey);
+
+	        if (value) value = _json.parse(value);
+
+	        if (successback) successback(value);
+	    }
+	    catch(err) {
+	        if (failback) failback(err);
+	    }
+	};
+
+	this.getAll = function(userGuid, successback, failback) {
+	    if (_cacheValid) {
+	    	successback && successback();
+	    	return;
+	    }
+
+	    try {
+	        var data = [];
+	        var dictionaries = getDictionaries(userGuid);
+	        // TODO: delete old dictionary entries
+
+	        var keys = getStorageKeys(userGuid);
+	        // TODO: this happens VERY often when cd_play is on - is it a good idea to run so many regex's?
+	        for (var i = 0; i < keys.length; i++) {
+	            var storageKey = keys[i];
+	            var matches = NEW_ITEM_REGEX.exec(storageKey);
+
+	            if (matches && matches[USER_GUID_INDEX] == userGuid) {
+	                var currKey = matches[REGULAR_KEY_INDEX];
+	                var currData = _json.parse(_localStorage.getItem(storageKey));
+
+	                if (currKey && currData != undefined)
+	                {
+	                    if (dictionaries[currKey]) {
+	                        currData.value = _json.stringify(dictionaries[currKey]);
+	                    }
+
+	                    data.push({key : currKey, saveObj : currData});
+	                }
+	            }
+	        }
+
+	        _cacheValid = true;
+
+	        if (successback) successback(data);
+	    }
+	    catch (err) {
+	        if (failback) failback(err);
+	    }
+	};
+
+	this.removeItem = function(userGuid, key, successback, failback, isStandaloneKey) {
+	    try {
+	        var storageKey;
+
+	        if (isStandaloneKey) {
+	            storageKey = key;
+	        }
+	        else {
+	            storageKey = createStorageKey(userGuid, key);
+	            removeKey(userGuid, storageKey);
+	        }
+
+	        _localStorage.removeItem(storageKey);
+
+	        if (!isStandaloneKey) {
+	            removeDictionaryEntries(userGuid, key);
+	        }
+
+	        if (successback) successback();
+	    }
+	    catch(err) {
+	        if (failback) failback(err);
+	    }
+	};
+
+	this.increment = function(userGuid, key, ttl, lastValue, successback, failback) {
+	    increment(_this, userGuid, key, ttl, lastValue, successback, failback);
+	};
+
+	this.getOrSetAndGet = function(userGuid, key, ttl, fallbackValue, successback, failback) {
+	    getOrSetAndGet(_this, userGuid, key, ttl, fallbackValue, successback, failback);
+	};
+
+	this.addToDictionary = function(userGuid, dictionaryKey, key, value) {
+	    var storageKey = createStorageDictionaryKey(userGuid, dictionaryKey, key);
+	    addKey(userGuid, storageKey);
+	    _localStorage.setItem(storageKey, _json.stringify(value));
+	};
+
+	this.removeFromDictionary = function(userGuid, dictionaryKey, key) {
+	    var storageKey = createStorageDictionaryKey(userGuid, dictionaryKey, key);
+	    removeKey(userGuid, storageKey);
+	    _localStorage.removeItem(storageKey);
+	};
+
+	function getDictionaries(userGuid, data) {
+	    var dictionaries = {};
+
+	    var keys = getStorageKeys(userGuid);
+	    // TODO: this happens VERY often when cd_play is on - is it a good idea to run so many regex's?
+	    for (var i = 0; i < keys.length; i++) {
+	        var storageKey = keys[i];
+	        var matches = DICTIONARY_REGEX.exec(storageKey);
+
+	        // 0 - userGuid, 1 - dictionary key, 2 - key in the dictionary
+	        if (matches) {
+	            if (matches[USER_GUID_INDEX] == userGuid) {
+	                if (!dictionaries[matches[DICTIONARY_KEY_INDEX]])
+	                    dictionaries[matches[DICTIONARY_KEY_INDEX]] = {};
+
+	                dictionaries[matches[DICTIONARY_KEY_INDEX]][matches[KEY_IN_DICTIONARY_INDEX]] = _json.parse(_localStorage.getItem(storageKey));
+	            }
+	        }
+	    }
+
+	    return dictionaries;
+	}
+
+	var KEYS_SUFFIX = "-keysV2";
+	var DELIMITER = ";|~";
+
+	// This will return all the keys - not only for this user
+	function getKeysUsingForeach(userGuid) {
+	    var keys = [];
+	    var key;
+
+	    for (var i = 0; i < _localStorage.length; i++) {
+	        key = _localStorage.key(i);
+	        var matches = /\[guid=(.+) .+\]$/.exec(key);
+
+	        if (matches && matches[USER_GUID_INDEX] == userGuid) {
+	            keys.push(key);
+	        }
+	    }
+
+	    return keys;
+	}
+
+	function getStorageKeys(userGuid) {
+	    var keys = _localStorage.getItem(userGuid + KEYS_SUFFIX);
+
+	    if (keys) {
+	        keys = keys.split(DELIMITER);
+	    }
+	    else {
+	        keys = getKeysUsingForeach(userGuid);
+	        setStorageKeys(userGuid, keys);
+	    }
+
+	    return keys;
+	}
+
+	function setStorageKeys(userGuid, keys) {
+		if (keys.length === 0) {
+			_localStorage.removeItem(userGuid + KEYS_SUFFIX);
+		} else {
+			_localStorage.setItem(userGuid + KEYS_SUFFIX, keys.join(DELIMITER));
+		}
+	}
+
+	function addKey(userGuid, key) {
+	    var keys = getStorageKeys(userGuid);
+
+	    if (inArray(key, keys) == -1) {
+	        keys.push(key);
+	        setStorageKeys(userGuid, keys);
+	    }
+	}
+
+	function removeKey(userGuid, key) {
+	    var keys = getStorageKeys(userGuid);
+
+	    var keyIndex = inArray(key, keys);
+	    if (keyIndex > -1) {
+	        keys.splice(keyIndex, 1);
+	        setStorageKeys(userGuid, keys);
+	    }
+	}
+
+	function inArray(key, arr) {
+	    for (var i = 0; i < arr.length; i++) {
+	        if (arr[i] == key) return i;
+	    }
+
+	    return -1;
+	}
+
+	function createStorageKey(userGuid, key) {
+	    return STORAGE_PREFIX + '[guid=' + userGuid + ' key=' + key + ']';
+	}
+
+	function createStorageDictionaryKey(userGuid, dictionaryKey, key) {
+	    return STORAGE_PREFIX + '[guid=' + userGuid + ' dict=' + dictionaryKey + ' key=' + key + ']';
+	}
+
+	ctor.apply(null, arguments);
+}
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/localStorageManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/groupedLocalStorageManager.js ###*/
+						function GroupedLocalStorageManager() {
+    var _this = this,
+        _localStorage,
+        _localStorageManager,
+        _initializedGuid;
+
+    function ctor() {
+        try {
+            _localStorage = window.localStorage;
+            _localStorageManager = new LocalStorageManager();
+        } catch (err) {
+            logError('local storage is blocked by browser settings error=' + err);
+        }
+    }
+
+    _this.testConnection = function(callback) {
+        testConnection(_this, callback);
+    };
+
+    _this.init = function init(userGuid, successback) {
+        try {
+            alignGroupedStorageEncoding(userGuid);
+            groupAndEncodeUserData(userGuid);
+            _initializedGuid = userGuid;
+        } catch (err) {
+            logError('error grouping and encoding old data error=' + err);
+        }
+
+        if (successback) successback();
+    };
+
+    function groupAndEncodeUserData(guid) {
+        _localStorageManager.getAll(guid,
+            function(data) {
+                for (var i = 0; i < data.length; i++) {
+                    setItem_grouped(guid, data[i].key, data[i].saveObj);
+                    _localStorageManager.removeItem(guid, data[i].key);
+                }
+            },
+            function(err) {
+                logError('error getting old data error=' + err);
+            }
+        );
+    }
+
+    this.setItem = function(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey) {
+        // we check the initialized guid or if the grouped storage exists because we can't know for sure that the target system uses grouped storage
+        if (_initializedGuid === userGuid) {
+            // if this is the initialized guid, we can trust that the grouped storage encoding was aligned during init.
+            setItem_grouped(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey);
+        } else if (isGroupedStorageExists(userGuid)) {
+            // if we are saving data to a different system (multiSystemWMData) we can afford to align the encoding as this does not happen often
+            alignGroupedStorageEncoding(userGuid);
+            setItem_grouped(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey);
+        } else {
+            _localStorageManager.setItem(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey);
+        }
+    };
+
+    function setItem_grouped(userGuid, key, value, successback, failback, clearDictionary, isStandaloneKey) {
+        try {
+            if (isStandaloneKey) {
+                _localStorage.setItem(key, _json.stringify(value));
+            } else {
+                var groupStorage = getGroupedStorage(userGuid);
+                groupStorage[key] = value;
+                setGroupedStorage(userGuid, groupStorage);
+            }
+
+            if (successback) successback();
+        } catch (err) {
+            if (failback) failback(err);
+        }
+    };
+
+    this.getItem = function(userGuid, key, successback, failback, isStandaloneKey) {
+        try {
+            var value;
+            if (isStandaloneKey) {
+                value = _json.parse(_localStorage.getItem(key));
+            } else {
+                var groupedStorage = getGroupedStorage(userGuid);
+                value = groupedStorage[key];
+            }
+
+            if (successback) successback(value);
+        }
+        catch (err) {
+            if (failback) failback(err);
+        }
+    };
+
+    this.getAll = function(userGuid, successback, failback) {
+        try {
+            var data = [];
+            var groupedStorage = getGroupedStorage(userGuid);
+            for (var key in groupedStorage) {
+                if (groupedStorage.hasOwnProperty(key)) {
+                    data.push({key: key, saveObj: groupedStorage[key]});
+                }
+            }
+
+            if (successback) successback(data);
+        }
+        catch (err) {
+            if (failback) failback(err);
+        }
+    };
+
+    this.removeItem = function(userGuid, key, successback, failback, isStandaloneKey) {
+        // we check the initialized guid or if the grouped storage exists because we can't know for sure that the target system uses grouped storage
+        // (remember that we can set values to other systems on the client using multiSystemWMData FF)
+        if (_initializedGuid === userGuid || isGroupedStorageExists(userGuid)) {
+            removeItem_grouped(userGuid, key, successback, failback, isStandaloneKey);
+        } else {
+            _localStorageManager.removeItem(userGuid, key, successback, failback, isStandaloneKey);
+        }
+    };
+
+    function removeItem_grouped(userGuid, key, successback, failback, isStandaloneKey) {
+        try {
+            if (isStandaloneKey) {
+                _localStorage.removeItem(key);
+            } else {
+                var groupedStorage = getGroupedStorage(userGuid);
+                delete groupedStorage[key];
+                setGroupedStorage(userGuid, groupedStorage);
+            }
+
+            if (successback) successback();
+        } catch (err) {
+            if (failback) failback(err);
+        }
+    };
+
+    this.increment = function(userGuid, key, ttl, lastValue, successback, failback) {
+        increment(_this, userGuid, key, ttl, lastValue, successback, failback);
+    };
+
+    this.getOrSetAndGet = function(userGuid, key, ttl, fallbackValue, successback, failback) {
+        getOrSetAndGet(_this, userGuid, key, ttl, fallbackValue, successback, failback);
+    };
+
+    ctor.apply(null, arguments);
+}
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/groupedLocalStorageManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/indexedDbManager.js ###*/
+						function IndexedDBManager() {
+	var _this = this;
+
+	var _indexedDbWorker;
+	var _actionsQueue;
+	var _actionNumber = 0;
+	var _running = 0;
+	var _terminated, _alreadyInit;
+
+	function ctor() {
+		_actionsQueue = {
+			init: [
+				function() {
+					_alreadyInit = true;
+				}
+			]
+		};
+	}
+
+	_this.init = function init(userGuid, successback) {
+		if (!_indexedDbWorker) {
+			_indexedDbWorker = new Worker('indexedDbManager.js');
+
+			_indexedDbWorker.onmessage = unqueueAction;
+
+			window.onbeforeunload = waitForTransactionsToFinish;
+		}
+
+		if (successback) {
+			if (_alreadyInit) successback();
+			else _actionsQueue.init.push(successback);
+		}
+	};
+
+	_this.testConnection = function(callback) {
+		if (!callback) return;
+
+		doAction(
+			'test',
+			TEST_CONNECTION_STRING,
+			null,
+			function() {
+				callback(true);
+			},
+			function() {
+				callback(false);
+			}
+		);
+	};
+
+	_this.terminate = function() {
+		_terminated = true;
+
+		if (_indexedDbWorker) _indexedDbWorker.terminate();
+	};
+
+	_this.setItem = function(userGuid, key, value, successback, failback, clearDictionary) {
+		doAction('set', userGuid, { key: key, value: value, clearDict: clearDictionary }, successback, failback);
+	};
+
+	_this.getItem = function(userGuid, key, successback, failback) {
+		doAction('get', userGuid, { key: key }, successback, failback);
+	};
+
+	_this.getAll = function(userGuid, successback, failback) {
+		doAction('all', userGuid, null, successback, failback);
+	};
+
+	_this.removeItem = function(userGuid, key, successback, failback) {
+		doAction('del', userGuid, { key: key }, successback, failback);
+	};
+
+	_this.addToSet = function(userGuid, key, addedRange, successCallback, failCallback) {
+		doAction('addSet', userGuid, { key: key, value: addedRange }, successCallback, failCallback);
+	};
+
+	this.addToDictionary = function(userGuid, dictionaryKey, key, value, successback, failback) {
+		doAction('add', userGuid, { dict: dictionaryKey, key: key, value: value }, successback, failback);
+	};
+
+	this.removeFromDictionary = function(userGuid, dictionaryKey, key, successback, failback) {
+		doAction('rem', userGuid, { dict: dictionaryKey, key: key }, successback, failback);
+	};
+
+	this.increment = function(userGuid, key, ttl, lastValue, successback, failback) {
+		doAction('inc', userGuid, { key: key, ttl: ttl, lastValue: lastValue }, successback, failback);
+	};
+
+	this.getOrSetAndGet = function(userGuid, key, ttl, fallbackValue, successback, failback) {
+		doAction('getOrSet', userGuid, { key: key, ttl: ttl, fallbackValue: fallbackValue }, successback, failback);
+	};
+
+	function doAction(action, guid, data, success, failed) {
+		incrementAction();
+
+		var actionObj = _json.stringify({
+			action: action,
+			guid: guid,
+			obj: data,
+			num: _actionNumber /*,
+            // Debug response times
+            requestTime : new Date().getTime()*/
+		});
+
+		_actionsQueue[_actionNumber] = {
+			success: success,
+			failed: failed
+		};
+
+		_running++;
+		_indexedDbWorker.postMessage(actionObj);
+	}
+
+	function incrementAction() {
+		_actionNumber++;
+
+		if (_actionNumber > 10000) {
+			_actionNumber = 0;
+		}
+	}
+
+	function unqueueAction(event) {
+		if (_terminated) return;
+
+		var responseData = _json.parse(event.data);
+
+		if (responseData == 'ready') {
+			for (var i = 0; i < _actionsQueue.init.length; i++) {
+				_actionsQueue.init[i]();
+			}
+
+			_actionsQueue.init.length = 0;
+		} else {
+			_running--;
+			var actionNumber = responseData.num;
+			var actions = _actionsQueue[actionNumber];
+			delete _actionsQueue[actionNumber];
+
+			if (responseData.success) {
+				if (actions && actions.success) actions.success(responseData.obj);
+			} else {
+				if (actions && actions.failed) actions.failed(responseData.obj);
+			}
+		}
+	}
+
+	function waitForTransactionsToFinish() {
+		if (_running > 0) {
+			sleep(150);
+		}
+	}
+
+	function sleep(milliseconds) {
+		var start = new Date().getTime();
+
+		for (var i = 0; i < 1e7; i++) {
+			if (new Date().getTime() - start > milliseconds) {
+				break;
+			}
+		}
+	}
+
+	ctor.apply(null, arguments);
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/indexedDbManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/sessionStorageManager.js ###*/
+						function SessionStorageManager() {
+	var _this = this,
+		STORAGE_PREFIX = 'WMS_',
+		_sessionStorage;
+
+	function ctor() {
+		try {
+			_sessionStorage = window.sessionStorage;
+	    }
+	    catch (err) {
+            logError('Session storage is blocked by browser settings error=' + err);
+	    }
+	}
+
+	_this.set = function(data) {
+		var key = STORAGE_PREFIX + data.userGuid + data.key;
+		_sessionStorage.setItem(key, data.value);
+	};
+
+	_this.get = function(data) {
+		var key = STORAGE_PREFIX + data.userGuid + data.key;
+
+		var value = _sessionStorage.getItem(key);
+
+		if (value === undefined) {
+			value = data.defaultValue;
+		}
+
+		return value;
+	};
+
+    ctor.apply(null, arguments);
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/sessionStorageManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/utils.js ###*/
+						function getGroupedStorage(guid) {
+    var groupedStorageKey = STORAGE_PREFIX + guid;
+    var groupedData = localStorage.getItem(groupedStorageKey);
+    if (groupedData) {
+        if (DI.Compressor && window.atob && window.btoa) {
+            groupedData = window.atob(groupedData);
+        }
+        groupedData = _json.parse(groupedData);
+    }
+
+    return groupedData || {};
+}
+
+function setGroupedStorage(guid, storage) {
+    var groupedStorageKey = STORAGE_PREFIX + guid;
+    var storageString = _json.stringify(storage);
+    if (DI.Compressor && window.atob && window.btoa) {
+        storageString = window.btoa(storageString);
+    }
+    localStorage.setItem(groupedStorageKey, storageString);
+}
+
+function isGroupedStorageExists(guid) {
+    var groupedStorageKey = STORAGE_PREFIX + guid;
+    var groupedData = localStorage.getItem(groupedStorageKey);
+    return !!groupedData;
+}
+
+function removeGroupedStorage(guid) {
+    var groupedStorageKey = STORAGE_PREFIX + guid;
+    localStorage.removeItem(groupedStorageKey);
+}
+
+function alignGroupedStorageEncoding(guid) {
+    var groupedStorageKey = STORAGE_PREFIX + guid;
+    var groupedData = localStorage.getItem(groupedStorageKey);
+    if (groupedData) {
+        // Base64 encoded string cannot contain '{' or '}' characters
+        var isEncoded = groupedData.indexOf('{') === -1;
+        if (DI.Compressor && !isEncoded && window.btoa) {
+            localStorage.setItem(groupedStorageKey, window.btoa(groupedData));
+        } else if (!DI.Compressor && isEncoded && window.atob) {
+            localStorage.setItem(groupedStorageKey, window.atob(groupedData));
+        }
+    }
+}
+
+function tryParseDictionaryFromStorage(str) {
+    try {
+        const parsedObject = JSON.parse(str);
+
+        if (typeof parsedObject === 'object' && parsedObject !== null && !(parsedObject instanceof Array)) {
+            return parsedObject;
+        } else {
+            return undefined;
+        }
+    } catch (err) {
+        return undefined;
+    }
+}
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/dataManagers/utils.js ###*/
+
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/broadcastChannel.js ###*/
+						var channel;
+var commonPriority = 0;
+
+function initBroadcastChannel() {
+    if (channel) return;
+
+    channel = new BroadcastChannel('wm-channel');
+    
+    channel.onmessage = function(e) {
+        var msg = Object.assign({}, e.data);
+
+        delete msg.toBC;
+
+        if (msg.commonPriority && msg.commonPriority > commonPriority) {
+            commonPriority = msg.commonPriority;
+            return;
+        }
+
+        if (msg.initCommonPriority) {
+            channel.postMessage({
+                commonPriority: commonPriority
+            });
+            return;
+        }
+    
+        talkToParent(Object.assign({fromBC: true}, msg));
+    }
+    
+    function talkToParent(msg) {
+        window.parent.postMessage(msg, '*');
+    }
+
+    channel.postMessage({
+        initCommonPriority: true
+    });
+    
+    window.onbeforeunload = function() {
+        channel.close();
+    };
+
+    talkToParent({
+        fromBC: true,
+        handshake: true
+    });
+}
+
+function getOwnershipManagerCommonPriority(data, event) {
+    commonPriority += 1;
+    channel.postMessage({
+        commonPriority: commonPriority
+    });
+
+    delete data.toBC;
+    data.fromBC = true;
+    data['ownershipManagerCommonPriority'] = commonPriority;
+    event.source.postMessage(data, '*');
+}
+
+function updateCommonPriority(data) {
+    if (data.updateCommonPriority < commonPriority) return;
+    commonPriority = data.updateCommonPriority;
+    // Telling other hidden iframes of my common priority so they will be synced
+    channel.postMessage({
+        commonPriority: commonPriority
+    });
+}
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/broadcastChannel.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/storageManager.js ###*/
+						var _saveMode;
+var storageManager;
+var crossSystemClientStorageManager;
+var sessionStorageManager = new SessionStorageManager();
+
+function handleSaveMode(saveMode, isPartitioned, isGrouped, userGuid, successback, failback) {
+    try {
+        if (!_saveMode || _saveMode != saveMode)
+        {
+            _saveMode = saveMode;
+
+            switch (_saveMode) {
+                case CROSS_DOMAIN_METHOD.Cookies:
+                    storageManager = new CookiesManager(isPartitioned);
+                    break;
+                case CROSS_DOMAIN_METHOD.IndexedDB:
+                    storageManager = new IndexedDBManager();
+                    break;
+                default:
+                    if (isGrouped) {
+                        storageManager = new GroupedLocalStorageManager();
+                    } else {
+                        storageManager = new LocalStorageManager();
+                    }
+                    break;
+            }
+        }
+
+        try {
+            if (!crossSystemClientStorageManager) {
+                crossSystemClientStorageManager = new CookiesManager(false);
+                crossSystemClientStorageManager.init(CROSS_SYSTEM_FAKE_GUID);
+            }
+        } catch (error) {
+            logError(error);
+        }
+
+        storageManager.init(userGuid, successback);
+    }
+    catch (err) {
+        if (failback) failback(err);
+    }
+}
+
+function checkCanSave(callback) {
+    storageManager.testConnection(callback);
+}
+
+function sendCantSave(data, event) {
+    event.source.postMessage(_json.stringify({key:data.requestType, canSave:false, reason: "storageOriginValidationFailed" }), '*');
+}
+
+function manageRequest(event) {
+    try {
+        var data = _json.parse(event.data);
+
+        if (data.toBC && channel) {
+            if (data.getOwnershipManagerCommonPriority) {
+                getOwnershipManagerCommonPriority(data, event);
+                return;
+            }
+            if (data.updateCommonPriority) {
+                updateCommonPriority(data);
+                return;
+            }
+
+            channel.postMessage(data);
+            return;
+        }
+
+        if (!shouldHandleRequestType(data.requestType)) return;
+        
+        data.plainUserGuid = data.userGuid;
+        data.userGuid = generateUserGuidEnv(data.userGuid, data);
+
+        if (isValidOrigin(data, event)) {
+            handleRequest(data, event);
+        } else {
+            sendCantSave(data, event);
+        }
+    } catch (err) {}
+}
+
+function handleRequest(data, event)
+{
+    if (data.requestType === REQUEST_TYPE.checkCanSave)
+    {
+        handleSaveMode(data.saveMode, data.extraData.isPartitioned, data.extraData.isGrouped, data.userGuid, function() {
+            checkCanSave(function(result) {
+                event.source.postMessage(_json.stringify({key:data.requestType, canSave:result }), '*');
+            });
+        });
+    }
+    else if (data.requestType === REQUEST_TYPE.getAllMultiple)
+    {
+        getAllSavedDataMultiple(data.userGuid, data.plainUserGuid, function(value) {
+            event.source.postMessage(_json.stringify({key:data.requestType, allValues:value}), '*');
+        });
+    }
+    else if (data.requestType === REQUEST_TYPE.set)
+    {
+        var storageManagerToUse = getStorageManagerToUse(data.userGuid);
+        storageManagerToUse.setItem(data.userGuid, data.key, data.saveObj);
+        if (storageManagerToUse.sendCookieSizeReport) {
+            storageManagerToUse.sendCookieSizeReport(event.source, data.key);
+        }
+    }
+    else if (data.requestType === REQUEST_TYPE.delete)
+    {
+        getStorageManagerToUse(data.userGuid).removeItem(data.userGuid, data.key);
+    }
+    else if (data.requestType === REQUEST_TYPE.deleteAll) {
+        storageManager.removeAll(data.userGuid);
+    }
+    else if (data.requestType === REQUEST_TYPE.add) {
+        addToDictionary(data.userGuid, data.key, data.keyValues, data.saveObj);
+        if (storageManager.sendCookieSizeReport) {
+            storageManager.sendCookieSizeReport(event.source, data.key);
+        }
+    }
+    else if (data.requestType === REQUEST_TYPE.addSet) {
+        addToSet(data.userGuid, data.key, data.saveObj);
+    }
+    else if (data.requestType === REQUEST_TYPE.get) {
+        // Using handle save mode here is because the get method can be used without
+        // initializing the storage manager
+        handleSaveMode(data.saveMode, data.extraData.isPartitioned, data.extraData.isGrouped, data.userGuid, function() {
+            getStorageManagerToUse(data.userGuid).getItem(data.userGuid, data.key, function(saveObj) {
+                if (saveObj) {
+                    event.source.postMessage(_json.stringify({key:data.requestType, dataKey : data.key, saveObj:saveObj}), '*');
+                }
+            });
+        });
+    }
+    else if (data.requestType === REQUEST_TYPE.setSession) {
+        sessionStorageManager.set(data);
+    }
+    else if (data.requestType === REQUEST_TYPE.getSession) {
+        var value = sessionStorageManager.get(data);
+
+        event.source.postMessage(_json.stringify({
+            key : data.requestType,
+            value : value,
+            actionId : data.actionId
+        }), '*');
+    }
+    else if (data.requestType === REQUEST_TYPE.increment) {
+        storageManager.increment(data.userGuid, data.key, data.ttl, data.lastValue, function(newValue) {
+            event.source.postMessage(_json.stringify({
+                key : data.requestType,
+                value : newValue,
+                actionId : data.actionId
+            }), '*');
+        });
+    }
+    else if (data.requestType === REQUEST_TYPE.getOrSetAndGet) {
+        storageManager.getOrSetAndGet(data.userGuid, data.key, data.ttl, data.fallbackValue, function(newValue) {
+            event.source.postMessage(_json.stringify({
+                key : data.requestType,
+                value : newValue,
+                actionId : data.actionId
+            }), '*');
+        });
+    }
+    else if (data.requestType === REQUEST_TYPE.terminate) {
+        if (storageManager.terminate) {
+            storageManager.terminate();
+        }
+
+        event.source.postMessage(_json.stringify({
+            key : data.requestType
+        }), '*');
+    }
+    else if (data.requestType === REQUEST_TYPE.remove) {
+        removeFromDictionary(data.userGuid, data.key, data.keysToRemove, data.saveObj);
+    }
+    else if (data.requestType === REQUEST_TYPE.getAllRaw) {
+        if (storageManager.getAllRaw) {
+            storageManager.getAllRaw(function(rawData) {
+                event.source.postMessage(_json.stringify({
+                    key: data.requestType, 
+                    rawData: rawData
+                }), '*');
+            });
+        }
+    }
+    else if (data.requestType === REQUEST_TYPE.getAllSystems) {
+        if (storageManager.getAllSystems) {
+            storageManager.getAllSystems(data.extraData.envName, function(value) {
+                event.source.postMessage(_json.stringify({
+                    key: data.requestType, 
+                    allSystems: value
+                }), '*');
+            });
+        }
+    }
+    else if (data.requestType === REQUEST_TYPE.initBroadcastChannel) {
+        return initBroadcastChannel();
+    }
+}
+
+if(window.addEventListener) {
+    window.addEventListener("message", manageRequest, false);
+} else if (window.attachEvent) {
+    window.attachEvent("onmessage", manageRequest);
+}
+
+// To make sure walkme will not run in CD iframe
+window.document.dontLoadTriangle = true;
+
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/storageManager.js ###*/
+    /*### INCLUDE START /builds/walkme/engine/player/player/player/resources/CD/cdIframe/initializer.js ###*/
+						function sendOriginMessageToParent() {
+	window.postMessage && window.parent.postMessage(ORIGIN_MESSAGE, '*');
+}
+
+window.onload = sendOriginMessageToParent;
+						/*### INCLUDE END /builds/walkme/engine/player/player/player/resources/CD/cdIframe/initializer.js ###*/
+})();</script></body></html>
