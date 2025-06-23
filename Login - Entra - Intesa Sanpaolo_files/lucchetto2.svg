@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 120" width="100" height="120">
+  <g fill="none" stroke="#666666" stroke-width="4">
+    <!-- Semicerchio perfetto sopra -->
+    <path d="M30,40 A20,20 0 0 1 70,40"></path>
+
+    <!-- Rettangolo: più largo che alto -->
+    <rect x="25" y="40" width="50" height="40" fill="none"></rect>
+
+    <!-- Serratura centrata (totale 18px: 8 del cerchio + 10 del gambo) -->
+    <!-- Centro verticale del rettangolo = 40 + 20 = 60 -->
+    <!-- Cerchio centro a 56, gambo da 60 a 70 -->
+    <circle cx="50" cy="56" r="4" fill="#666666" stroke="none"></circle>
+    <rect x="48" y="60" width="4" height="10" fill="#666666" stroke="none"></rect>
+  </g>
+</svg>
