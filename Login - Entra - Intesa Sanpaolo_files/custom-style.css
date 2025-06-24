@@ -1,0 +1,32 @@
+/* CSS personalizzato per la pagina di login */
+
+/*
+  Risoluzione del problema dello spazio e posizionamento form su mobile.
+  Spostamento verso l'alto dell'intero body per evitare che il titolo
+  venga nascosto da elementi della pagina principale.
+*/
+/* @media (max-width: 767px) {
+  body.primary-font {
+    position: relative;
+    top: -20px;
+  }
+} */
+
+/*
+  Spostamento verso l'alto dell'iframe del login
+  solo per la visualizzazione su mobile.
+*/
+/* @media (max-width: 767px) {
+    #ifrmMulti-1516392239 {
+      position: relative;
+      margin-top: -60px;
+    }
+} */
+
+/* Reset dello stile per desktop */
+/* @media (min-width: 768px) {
+    #ifrmMulti-1516392239 {
+      position: relative;
+      top: 0px;
+    }
+} */

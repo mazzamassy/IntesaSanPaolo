@@ -183,9 +183,6 @@
 	
     
 <link rel="stylesheet" href="./Login - Entra - Intesa Sanpaolo_files/clientlib-smartbanner.css" type="text/css">
-
-
-
     
 
     <style>
@@ -230,6 +227,65 @@
             background: url('./Home-Computer-Business.jpg') no-repeat center center fixed;
             background-size: cover;
   }
+
+/* 
+  .collapse { display: none; }
+.collapse.show { display: block; } */
+
+
+#icon-close-desktop {
+  font-size: 2.5rem;
+  cursor: pointer;
+  margin-bottom: 20px;
+  align-items: center;
+  /* margin-left: 16px; */
+  vertical-align: middle;
+  color: #fff;
+  display: inline-block;
+}
+#menu-toggle-btn-desktop {
+  position: relative;
+}
+
+
+#slidemenu.collapse.in {
+  display: block !important;
+}
+
+#slidemenu {
+  display: none;
+  /* altri stili per il pannello mobile */
+}
+#slidemenu.in {
+  display: block;
+  /* animazione/slide-in se vuoi */
+}
+
+#icon-hamburger-desktop, #icon-close-desktop {
+  vertical-align: middle;
+}
+
+/* #icon-hamburger-mobile { display: inline; }
+  #icon-close-mobile { display: none; }
+  #slidemenu.in ~ #menu-toggle-btn-mobile #icon-hamburger-mobile { display: none !important; }
+  #slidemenu.in ~ #menu-toggle-btn-mobile #icon-close-mobile { display: inline; } */
+
+  #icon-hamburger-mobile{
+  vertical-align: middle;
+  font-size: 2.5rem; /* stessa dimensione */
+  color: #fff;       /* stesso colore */
+  display: inline;   /* default, ma JS lo gestisce */
+  /* eventuali altri stili che hai sull'hamburger */
+}
+
+#icon-close-mobile {
+    margin-bottom: 35px;
+    /* vertical-align: middle; */
+  font-size: 2.5rem; /* stessa dimensione */
+  color: #fff;       /* stesso colore */
+  display: inline;  
+}
+  
 </style>
 
 
@@ -373,7 +429,9 @@ var cmsTargetConfig = {
 .fb_iframe_widget{display:inline-block;position:relative}.fb_iframe_widget span{display:inline-block;position:relative;text-align:justify}.fb_iframe_widget iframe{position:absolute}.fb_iframe_widget_fluid_desktop,.fb_iframe_widget_fluid_desktop span,.fb_iframe_widget_fluid_desktop iframe{max-width:100%}.fb_iframe_widget_fluid_desktop iframe{min-width:220px;position:relative}.fb_iframe_widget_lift{z-index:1}.fb_iframe_widget_fluid{display:inline}.fb_iframe_widget_fluid span{width:100%}
 </style><link rel="stylesheet" href="./Login - Entra - Intesa Sanpaolo_files/ndcelogin-modal-common.green.css"><script async="" src="./Login - Entra - Intesa Sanpaolo_files/settings(1).txt" id="mt_script_210571819" class="walkme-to-remove"></script></head>
 
-<!-- <body data-ng-app="ispApp" data-controller="ContentCtrl" data-cookies-control-banner="" class="ng-scope"><access-widget-ui data-acsb="" class="notranslate"><template shadowrootmode="open"><div part="container"><button class="screen-reader-button " data-acsb-sr-only="true" aria-pressed="false" tabindex="-1">Utilizzare questo sito Web in modalità Screen-Reader</button></div></template></access-widget-ui><a href="https://accessibe.com/blog/knowledgebase/screen-reader-guide" target="_blank" rel="noopener" tabindex="-1" data-acsb="sr-trigger" data-acsb-sr-only="true" class="acsb-sr-only" style="position: absolute; width: 200px; height: 1px; margin-top: -1px; z-index: -1; border: 0px; top: 0px; left: 0px; overflow: hidden; outline: 0px;">Guida all'accessibilità per lettori dello schermo, feedback e segnalazione dei problemi | Nuova finestra</a><access-widget-ui data-acsb="skipLinks" class="notranslate"><template shadowrootmode="open"><div part="container"><div class="skip-links " role="region" aria-label="Salta i collegamenti" data-acsb="skipLinks"><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbContent" data-acsb-skip-link="content" class="skip-link">Salta al contenuto<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbMenu" data-acsb-skip-link="menu" class="skip-link">Passa all'intestazione<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbFooter" data-acsb-skip-link="footer" class="skip-link">Passa al piè di pagina<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div></div></div></template></access-widget-ui><access-widget-ui data-acsb="" class="notranslate"><template shadowrootmode="open"><div part="container"><button part="acsb-trigger" data-testid="acsb-trigger" class="  container size-medium position-x-left position-y-bottom  " aria-label="Opzioni di accessibilità aperte, dichiarazione e aiuto" tabindex="0"><span class="icon" part="acsb-trigger-icon"><svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 100 131.3" part="acsb-trigger-icon-svg" data-testid="base-icon-svg" style="display: inline-flex;"><path xmlns="http://www.w3.org/2000/svg" d="M71.6 131.3c1 0 2.1-.3 3.1-.8 3.9-1.8 5.5-6.2 3.6-10.1 0 0-14.3-32.7-16.9-44.7-1-4.2-1.6-15.3-1.8-20.5 0-1.8 1-3.4 2.6-3.9l32-9.6c3.9-1 6.2-5.5 5.2-9.4-1-3.9-5.5-6.2-9.4-5.2 0 0-29.6 9.6-40.3 9.6-10.4 0-39.8-9.4-39.8-9.4-3.9-1-8.3.8-9.6 4.7-1.3 4.2 1 8.6 5.2 9.6l32 9.6c1.6.5 2.9 2.1 2.6 3.9-.3 5.2-.8 16.4-1.8 20.5-2.6 12-16.9 44.7-16.9 44.7-1.8 3.9 0 8.3 3.6 10.1 1 .5 2.1.8 3.1.8 2.9 0 5.7-1.6 6.8-4.4l15.3-31.2L64.8 127c1.3 2.7 3.9 4.3 6.8 4.3z"></path><circle xmlns="http://www.w3.org/2000/svg" cx="50.3" cy="14.6" r="14.6" style="fill:#fff"></circle></svg><span class="active-actions-icon"><svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 105 79" data-testid="base-icon-svg" style=""><path xmlns="http://www.w3.org/2000/svg" d="M12.6 38.9C6 31.9-4.7 42.6 2.3 49.2c8.7 9 17.3 18.3 26.3 27 4 3.7 7 3.7 10.7 0l63.6-63.3c6.7-7-3.7-17.6-10.7-10.7l-57.9 58-21.7-21.3z"></path></svg></span></span></button></div></template></access-widget-ui> -->
+<!-- <body data-ng-app="ispApp" data-controller="ContentCtrl" data-cookies-control-banner="" class="ng-scope"><access-widget-ui data-acsb="" class="notranslate"><template shadowrootmode="open"><div style="position: absolute; width: 200px; height: 1px; margin-top: -1px; z-index: -1; border: 0px; top: 0px; left: 0px; overflow: hidden; outline: 0px;">Guida all'accessibilità per lettori dello schermo, feedback e segnalazione dei problemi | Nuova finestra</a><access-widget-ui data-acsb="skipLinks" class="notranslate"><template shadowrootmode="open"><div part="container"><div class="skip-links " role="region" aria-label="Salta i collegamenti" data-acsb="skipLinks"><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbContent" data-acsb-skip-link="content" class="skip-link">Salta al contenuto<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbMenu" data-acsb-skip-link="menu" class="skip-link">Passa all'intestazione<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div><div><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#acsbFooter" data-acsb-skip-link="footer" class="skip-link">Passa al piè di pagina<div class="content" aria-hidden="true"><span class="icon">↵</span>ENTER</div></a></div></div></div></template></access-widget-ui><access-widget-ui data-acsb="" class="notranslate"><template shadowrootmode="open"><div part="container"><button part="acsb-trigger" data-testid="acsb-trigger" class="  container size-medium position-x-left position-y-bottom  " aria-label="Opzioni di accessibilità aperte, dichiarazione e aiuto" tabindex="0"><span class="icon" part="acsb-trigger-icon"><svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 100 131.3" part="acsb-trigger-icon-svg" data-testid="base-icon-svg" style="display: inline-flex;"><path xmlns="http://www.w3.org/2000/svg" d="M71.6 131.3c1 0 2.1-.3 3.1-.8 3.9-1.8 5.5-6.2 3.6-10.1 0 0-14.3-32.7-16.9-44.7-1-4.2-1.6-15.3-1.8-20.5 0-1.8 1-3.4 2.6-3.9l32-9.6c3.9-1 6.2-5.5 5.2-9.4-1-3.9-5.5-6.2-9.4-5.2 0 0-29.6 9.6-40.3 9.6-10.4 0-39.8-9.4-39.8-9.4-3.9-1-8.3.8-9.6 4.7-1.3 4.2 1 8.6 5.2 9.6l32 9.6c1.6.5 2.9 2.1 2.6 3.9-.3 5.2-.8 16.4-1.8 20.5-2.6 12-16.9 44.7-16.9 44.7-1.8 3.9 0 8.3 3.6 10.1 1 .5 2.1.8 3.1.8 2.9 0 5.7-1.6 6.8-4.4l15.3-31.2L64.8 127c1.3 2.7 3.9 4.3 6.8 4.3z"></path><circle xmlns="http://www.w3.org/2000/svg" cx="50.3" cy="14.6" r="14.6" style="fill:#fff"></circle></svg><span class="active-actions-icon"><svg fill="currentColor" xmlns="http://www.w3.org/2000/svg" xml:space="preserve" viewBox="0 0 105 79" data-testid="base-icon-svg" style=""><path xmlns="http://www.w3.org/2000/svg" d="M12.6 38.9C6 31.9-4.7 42.6 2.3 49.2c8.7 9 17.3 18.3 26.3 27 4 3.7 7 3.7 10.7 0l63.6-63.3c6.7-7-3.7-17.6-10.7-10.7l-57.9 58-21.7-21.3z"></path></svg></span></span></button></div></template></access-widget-ui> -->
+<br>
+<br>
 
 	
 
@@ -664,15 +722,15 @@ Per accettare tutti i cookie, clicca sul pulsante "Acconsento".</p>
 		<div class="col-md-22 col-sm-22 col-xs-22 col-xs-offset-1">
 			<ul class="nav nav-tabs content-burger__tabs" role="tablist">
 				<li role="presentation">
-					<a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#tabs1" role="tab" data-toggle="tab" id="vt6c11b71f09520aaf24c7ef087884aa4e69434b62d54efb9c29c2783a6067ed5e" title="Tutti i Prodotti" aria-selected="false">Tutti i Prodotti</a>
+					<a href="./index.html" role="tab" data-toggle="tab" id="vt6c11b71f09520aaf24c7ef087884aa4e69434b62d54efb9c29c2783a6067ed5e" title="Tutti i Prodotti" aria-selected="false">Tutti i Prodotti</a>
 				</li>
 			
 				<li role="presentation">
-					<a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#tabs2" role="tab" data-toggle="tab" id="vt6077e763480ef664a763466ce03e8b29627eea0621d4d753e5a3f8c0a96c72c6" title="Tutti i giorni" aria-selected="false">Tutti i giorni</a>
+					<a href="./index.html" role="tab" data-toggle="tab" id="vt6077e763480ef664a763466ce03e8b29627eea0621d4d753e5a3f8c0a96c72c6" title="Tutti i giorni" aria-selected="false">Tutti i giorni</a>
 				</li>
 			
 				<li role="presentation">
-					<a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#tabs3" role="tab" data-toggle="tab" id="vtbfae264ff04d6833a5d1ea8f722487b6efe5a4ac8eea0b796ee4fd504a0ebdb4" title="Momenti della Vita" aria-selected="false">Momenti della Vita</a>
+					<a href="./index.html" role="tab" data-toggle="tab" id="vtbfae264ff04d6833a5d1ea8f722487b6efe5a4ac8eea0b796ee4fd504a0ebdb4" title="Momenti della Vita" aria-selected="false">Momenti della Vita</a>
 				</li>
 			</ul>
 		</div>
@@ -1231,15 +1289,18 @@ Per accettare tutti i cookie, clicca sul pulsante "Acconsento".</p>
 
                 
                 <div id="section-burger" class="content-target__block content-target--burger">
-                    <button type="button" data-toggle="collapse" data-target="#collapse-menu" aria-expanded="false" aria-controls="collapse-menu">
-							<span class="btn-icon icon--menu">
-								<span></span>
-								<span></span>
-								<span></span>
-							</span>
+                    <button type="button" id="menu-toggle-btn-desktop" aria-label="Menu">
+                        <span class="btn-icon icon--menu" id="icon-hamburger-desktop">
+                            <span></span>
+                            <span></span>
+                            <span></span>
+                        </span>
+                        <span class="btn-icon icon--close" id="icon-close-desktop" style="display:none;">&times;</span>
                         <span class="btn-text">Menu</span>
                     </button>
                 </div>
+
+                
                 
 
                 
@@ -1280,7 +1341,7 @@ Per accettare tutti i cookie, clicca sul pulsante "Acconsento".</p>
 <div id="galleggiante-container-id" class="ga-tools tl-float js-tl-float " data-controller="GalleggianteCtrl" data-json="/content/internetbanking/it/faq/common.vetrinasearchfaqgal.json" data-maxnum="10" data-path="/content/vetrina/it/persone-e-famiglie/login-page">
 	 
     <div class="ga-tools__btn tl-float__help ">
-        <a href="https://www.intesasanpaolo.com/it/persone-e-famiglie/login-page.html#" onclick="return false">
+        <a href="" onclick="return false">
             <span data-icon="" class="icon ico-tool-help"></span>
         </a>
 
@@ -1595,14 +1656,15 @@ Il gestore online risponderà dall'Italia</p>
 
                 
                 <div id="section-burger-mobile" class="content-target__block content-target--burger">
-                    <button type="button" data-toggle="collapse" data-target="#slidemenu" aria-expanded="false" aria-controls="slidemenu" class="collapsed">
-						<span class="btn-icon icon--menu">
-							<span></span>
-							<span></span>
-							<span></span>
-						</span>
+                    <button type="button" id="menu-toggle-btn-mobile" aria-label="Menu">
+                        <span class="btn-icon icon--menu" id="icon-hamburger-mobile">
+                          <span></span>
+                          <span></span>
+                          <span></span>
+                        </span>
+                        <span class="btn-icon icon--close" id="icon-close-mobile" style="display:none;">&times;</span>
                         <span class="sr-only btn-text">Menu</span>
-                    </button>
+                      </button>
                 </div>
                 
             </div>
@@ -1632,7 +1694,7 @@ Il gestore online risponderà dall'Italia</p>
 							
 						</span>
                         
-                        <span class="btn-icon icon--close">
+                        <span><img src="./Login - Entra - Intesa Sanpaolo_files/lucket.svg" alt="access" style="width: 30px; height: 30px;">
 							<span></span>
 							<span></span>
 							<span></span>
@@ -1650,6 +1712,7 @@ Il gestore online risponderà dall'Italia</p>
 
         
         <div id="slidemenu" class="collapse" aria-expanded="false" role="navigation">
+            <!-- <button class="close-menu-mobile" aria-label="Chiudi menu" style="font-size:2rem;position:absolute;top:10px;right:20px;background:none;border:none;color:#fff;z-index:10;">&times;</button> -->
             <div id="collapse-menu-mobile" class="ga-content content-burger js-content-burger">
                 
 
@@ -1684,7 +1747,7 @@ Il gestore online risponderà dall'Italia</p>
                         
     <button class="nav-link dropdown-toggle js-mobile-menu active" id="dropdownMenuPersone-1" data-toggle="dropdown" aria-expanded="false" data-path="/content/vetrina/it/persone-e-famiglie" aria-pressed="false" aria-controls="menuPersone-level-2" aria-owns="menuPersone-level-2" data-click="">
 
-        <span>Persone e Famiglie</span>
+        <span><a href="https://www.intesasanpaolo.com/it/persone-e-famiglie.html">Persone e Famiglie</a></span>
         
         <span class="sr-only"></span>
     </button>
@@ -2238,7 +2301,7 @@ Il gestore online risponderà dall'Italia</p>
                         
     <button class="nav-link dropdown-toggle js-mobile-menu" id="dropdownMenuPersone-2" data-toggle="dropdown" aria-expanded="false" data-path="/content/vetrina/it/business" aria-pressed="false" aria-controls="menuPersone-level-2" aria-owns="menuPersone-level-2" data-click="">
 
-        <span>Business</span>
+        <span><a href="https://www.intesasanpaolo.com/it/business.html">Business</a></span>
         
         <span class="sr-only"></span>
     </button>
@@ -2789,7 +2852,7 @@ Il gestore online risponderà dall'Italia</p>
                         
     <button class="nav-link dropdown-toggle js-mobile-menu" id="dropdownMenuPersone-3" data-toggle="dropdown" aria-expanded="false" data-path="/content/vetrina/it/exclusive" aria-pressed="false" aria-controls="menuPersone-level-2" aria-owns="menuPersone-level-2" data-click="">
 
-        <span>Exclusive</span>
+        <span><a href="https://www.intesasanpaolo.com/it/exclusive.html">Exclusive</a></span>
         
         <span class="sr-only"></span>
     </button>
@@ -3378,8 +3441,20 @@ Il gestore online risponderà dall'Italia</p>
 			<div class="block__iframe ">
 				
 
-	<iframe data-isp-multicol-iframe="" data-parameters="false" data-iframe-area="" data-directive-iframe-area="" data-tracking-form-cmb="false" data-iframe-area-path="/ndcelogin/webapp/authorize" data-iframe-scrolling="none" src="./Login - Entra - Intesa Sanpaolo_files/authorize.html" id="ifrmMulti-1516392239" name="ifrmMulti-1516392239" data-iframe-login="/ndcelogin/webapp/authorize" style="width: 100%; height: 354px !important;">
-	</iframe>
+	<!-- <iframe data-isp-multicol-iframe="" data-parameters="false" data-iframe-area="" data-directive-iframe-area="" data-tracking-form-cmb="false" data-iframe-area-path="/ndcelogin/webapp/authorize" data-iframe-scrolling="none" src="./Login - Entra - Intesa Sanpaolo_files/authorize.html" id="ifrmMulti-1516392239" name="ifrmMulti-1516392239" data-iframe-login="/ndcelogin/webapp/authorize" style="width: 100%; height: 354px !important;"> -->
+		<iframe data-isp-multicol-iframe="" data-parameters="false" data-iframe-area="" data-directive-iframe-area="" data-tracking-form-cmb="false" data-iframe-area-path="/ndcelogin/webapp/authorize" data-iframe-scrolling="none" src="./Login - Entra - Intesa Sanpaolo_files/authorize.html" id="ifrmMulti-1516392239" name="ifrmMulti-1516392239" data-iframe-login="/ndcelogin/webapp/authorize" style="width: 100%; height: 400px;">
+
+    </iframe>
+
+    <style>
+    @media (max-width: 767px) {
+        #ifrmMulti-1516392239 {
+          position: relative;
+          margin-top: -60px;
+          height: 354px !important;
+        }
+    }
+</style>
 
 			</div>
 		</div>
@@ -5564,6 +5639,10 @@ Partita IVA 11991500015 (IT11991500015)</p>
 
     
 <script src="./Login - Entra - Intesa Sanpaolo_files/clientlib-site.lc-202506061229-lc.js.download"></script>
+<!-- <script src="./files_js/wmjQuery360.js.download"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
+<script src="./files_js/angular.js.download"></script>
+<script src="./files_js/vendor.js.download"></script> -->
 
 
 
@@ -5650,4 +5729,99 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 });
 </script>
+
+
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+      var desktopBtn = document.getElementById('menu-toggle-btn-desktop');
+      var mobileBtn = document.getElementById('menu-toggle-btn-mobile');
+      var desktopMenu = document.getElementById('collapse-menu');
+      var mobileMenu = document.getElementById('slidemenu');
+      var iconHamburgerMobile = document.getElementById('icon-hamburger-mobile');
+      var iconCloseMobile = document.getElementById('icon-close-mobile');
+      var iconHamburgerDesktop = document.getElementById('icon-hamburger-desktop');
+      var iconCloseDesktop = document.getElementById('icon-close-desktop');
+    
+      function closeMenus() {
+  if (desktopMenu) desktopMenu.classList.remove('show');
+  if (mobileMenu) mobileMenu.classList.remove('in');
+  if (iconHamburgerMobile) iconHamburgerMobile.style.display = '';
+  if (iconCloseMobile) iconCloseMobile.style.display = 'none';
+  if (iconHamburgerDesktop) iconHamburgerDesktop.style.display = '';
+  if (iconCloseDesktop) iconCloseDesktop.style.display = 'none';
+}
+    
+if (desktopBtn) {
+  desktopBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (window.innerWidth >= 992) {
+      var isOpen = desktopMenu.classList.contains('show');
+      closeMenus();
+      if (!isOpen) {
+        desktopMenu.classList.add('show');
+        if (iconHamburgerDesktop) iconHamburgerDesktop.style.display = 'none';
+        if (iconCloseDesktop) iconCloseDesktop.style.display = '';
+      }
+    }
+  });
+}
+    
+      if (iconCloseMobile) {
+        iconCloseMobile.addEventListener('click', function(e) {
+          e.stopPropagation();
+          closeMenus();
+        });
+      }
+
+      if (iconCloseDesktop) {
+        iconCloseDesktop.addEventListener('click', function(e) {
+          e.stopPropagation();
+          closeMenus();
+        });
+      }
+    
+      if (mobileBtn) {
+  mobileBtn.addEventListener('click', function(e) {
+    e.preventDefault();
+    if (window.innerWidth < 992) {
+      var isOpen = mobileMenu.classList.contains('in');
+      closeMenus();
+      if (!isOpen) {
+        mobileMenu.classList.add('in');
+        if (iconHamburgerMobile) iconHamburgerMobile.style.display = 'none';
+        if (iconCloseMobile) iconCloseMobile.style.display = '';
+      }
+    }
+  });
+}
+    
+      // Chiudi il menu cliccando fuori (desktop)
+      document.addEventListener('click', function(e) {
+        if (
+          desktopMenu && desktopMenu.classList.contains('show') &&
+          !desktopMenu.contains(e.target) &&
+          (!desktopBtn || !desktopBtn.contains(e.target)) &&
+          (!iconCloseDesktop || !iconCloseDesktop.contains(e.target))
+        ) {
+          closeMenus();
+        }
+        if (
+  mobileMenu && mobileMenu.classList.contains('in') &&
+  !mobileMenu.contains(e.target) &&
+  (!mobileBtn || !mobileBtn.contains(e.target))
+) {
+  closeMenus();
+}
+      });
+    });
+
+    var closeMobileBtn = document.querySelector('#slidemenu .close-menu-mobile');
+  if (closeMobileBtn) {
+    closeMobileBtn.addEventListener('click', function(e) {
+      e.preventDefault();
+      closeMenus();
+    });
+  }
+    </script>
 </body></html>
